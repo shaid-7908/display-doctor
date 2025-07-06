@@ -107,7 +107,7 @@ class AdminController {
     // Generate username and password
     const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
     const password = Math.random().toString(36).slice(-8) + Math.floor(Math.random() * 1000);
-
+    const hashedPassword = await hashPassword(password);
     // Create caller data
     const callerData = {
       firstName,
@@ -125,6 +125,7 @@ class AdminController {
       profileImage,
       status: status || "active",
       notes,
+      password: hashedPassword,
     };
 
     // Create the caller

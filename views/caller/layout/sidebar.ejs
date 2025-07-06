@@ -1,0 +1,49 @@
+<nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+    <div class="position-sticky pt-3">
+        <div class="text-center mb-4">
+            <img src="https://res.cloudinary.com/dycvkezau/image/upload/v1751786166/WhatsApp_Image_2025-07-03_at_10.39.29_245bf40b-removebg-preview_iwumxs.png"
+                alt="Company Logo" style="max-width: 120px; height: auto; margin: 0 auto;">
+            <h5 class="text-white mt-2">Caller Portal</h5>
+        </div>
+
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link <%= currentPage === 'dashboard' ? 'active' : '' %>" href="/caller/dashboard">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= currentPage === 'customers' ? 'active' : '' %>" href="/caller/customers">
+                    <i class="fas fa-users me-2"></i>
+                    My Customers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= currentPage === 'create-customer' ? 'active' : '' %>"
+                    href="/caller/create-customer">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Add Customer
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= currentPage === 'create-issue' ? 'active' : '' %>" href="/caller/create-issue">
+                    <i class="fas fa-tv me-2"></i>
+                    Create TV Issue
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= currentPage === 'profile' ? 'active' : '' %>" href="/caller/profile">
+                    <i class="fas fa-user me-2"></i>
+                    My Profile
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a class="nav-link" href="/caller/logout">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

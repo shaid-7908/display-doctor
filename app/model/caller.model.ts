@@ -64,6 +64,12 @@ const callerSchema = new Schema<ICaller>(
       trim: true,
       maxlength: 20 
     },
+    password: { 
+      type: String, 
+      required: true,
+      trim: true,
+      minlength: 8
+    },
     emergencyContact: { 
       type: String, 
       trim: true,

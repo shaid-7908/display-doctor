@@ -18,6 +18,7 @@ export interface ICaller extends Document {
   notes?: string;
   created_at: Date;
   updated_at: Date;
+  password: string;
 }
 
 export interface CreateCallerRequest {

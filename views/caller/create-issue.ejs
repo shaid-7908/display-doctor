@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/caller.css" rel="stylesheet">
+    <style>
+        .form-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-action {
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-control:focus {
+            border-color: #0d5b94;
+            box-shadow: 0 0 0 0.2rem rgba(13, 91, 148, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .customer-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <%- include('./layout/sidebar', { currentPage: 'create-issue' }) %>
+
+                <!-- Main content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+                    <div class="container-fluid py-4">
+                        <!-- Header Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h2 class="mb-1">
+                                            <i class="fas fa-tv me-2 text-primary"></i>Create TV Issue
+                                        </h2>
+                                        <p class="text-muted mb-0">Report a new TV issue for your customer</p>
+                                    </div>
+                                    <div>
+                                        <a href="/caller/customers" class="btn btn-outline-secondary btn-action">
+                                            <i class="fas fa-arrow-left me-2"></i>Back to Customers
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <%- include('../common/flash-message') %>
+
+                            <!-- Form Section -->
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="form-card card">
+                                        <div class="card-header bg-white border-0">
+                                            <h5 class="mb-0 fw-bold">
+                                                <i class="fas fa-tv me-2 text-primary"></i>TV Issue Information
+                                            </h5>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <form action="/caller/create-issue" method="POST">
+                                                <!-- Customer Selection -->
+                                                <div class="row mb-4">
+                                                    <div class="col-12">
+                                                        <label for="customer_id" class="form-label">
+                                                            <i class="fas fa-user me-2"></i>Select Customer *
+                                                        </label>
+                                                        <select class="form-select form-select-lg" id="customer_id"
+                                                            name="customer_id" required>
+                                                            <option value="">Choose a customer...</option>
+                                                            <% customers.forEach(customer=> { %>
+                                                                <option value="<%= customer._id %>">
+                                                                    <%= customer.customer_name %>
+                                                                        <% if (customer.customer_email) { %>
+                                                                            (<%= customer.customer_email %>)
+                                                                                <% } %>
+                                                                                    <% if (customer.customer_city) { %>
+                                                                                        - <%= customer.customer_city %>,
+                                                                                            <%= customer.customer_state
+                                                                                                %>
+                                                                                                <% } %>
+                                                                </option>
+                                                                <% }); %>
+                                                        </select>
+                                                        <div id="customer-info" class="customer-info"
+                                                            style="display: none;">
+                                                            <!-- Customer details will be populated here -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Issue Details -->
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="issue_name" class="form-label">
+                                                            <i class="fas fa-exclamation-triangle me-2"></i>Issue Name *
+                                                        </label>
+                                                        <input type="text" class="form-control form-control-lg"
+                                                            id="issue_name" name="issue_name" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="issue_status" class="form-label">
+                                                            <i class="fas fa-toggle-on me-2"></i>Issue Status
+                                                        </label>
+                                                        <select class="form-select form-select-lg" id="issue_status"
+                                                            name="issue_status">
+                                                            <option value="open">Open</option>
+                                                            <option value="in_progress">In Progress</option>
+                                                            <option value="resolved">Resolved</option>
+                                                            <option value="closed">Closed</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <label for="issue_description" class="form-label">
+                                                            <i class="fas fa-align-left me-2"></i>Issue Description *
+                                                        </label>
+                                                        <textarea class="form-control" id="issue_description"
+                                                            name="issue_description" rows="4"
+                                                            placeholder="Describe the TV issue in detail..."
+                                                            required></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <!-- TV Information -->
+                                                <div class="row">
+                                                    <div class="col-md-4 mb-3">
+                                                        <label for="tv_model" class="form-label">
+                                                            <i class="fas fa-tv me-2"></i>TV Model
+                                                        </label>
+                                                        <input type="text" class="form-control form-control-lg"
+                                                            id="tv_model" name="tv_model" placeholder="e.g., Samsung 55"
+                                                            QLED">
+                                                    </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <label for="tv_serial_number" class="form-label">
+                                                            <i class="fas fa-barcode me-2"></i>Serial Number
+                                                        </label>
+                                                        <input type="text" class="form-control form-control-lg"
+                                                            id="tv_serial_number" name="tv_serial_number"
+                                                            placeholder="TV serial number">
+                                                    </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <label for="tv_size" class="form-label">
+                                                            <i class="fas fa-expand me-2"></i>TV Size
+                                                        </label>
+                                                        <input type="text" class="form-control form-control-lg"
+                                                            id="tv_size" name="tv_size" placeholder="e.g., 55 inch">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <label for="issue_notes" class="form-label">
+                                                            <i class="fas fa-sticky-note me-2"></i>Additional Notes
+                                                        </label>
+                                                        <textarea class="form-control" id="issue_notes"
+                                                            name="issue_notes" rows="3"
+                                                            placeholder="Any additional notes or special instructions..."></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-flex justify-content-between">
+                                                    <button type="button" class="btn btn-outline-secondary btn-action"
+                                                        onclick="history.back()">
+                                                        <i class="fas fa-times me-2"></i>Cancel
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary btn-action">
+                                                        <i class="fas fa-save me-2"></i>Create Issue
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sidebar Info -->
+                                <div class="col-lg-4">
+                                    <div class="form-card card">
+                                        <div class="card-header bg-white border-0">
+                                            <h5 class="mb-0 fw-bold">
+                                                <i class="fas fa-info-circle me-2 text-primary"></i>Information
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-lightbulb me-2"></i>
+                                                <strong>Tips:</strong>
+                                                <ul class="mb-0 mt-2">
+                                                    <li>All fields marked with * are required</li>
+                                                    <li>Select the customer from your assigned list</li>
+                                                    <li>Provide detailed issue description</li>
+                                                    <li>TV information is optional but helpful</li>
+                                                    <li>Issue status can be updated later</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-shield-alt me-2"></i>
+                                                <strong>Important:</strong>
+                                                <p class="mb-0 mt-2">You can only create issues for customers assigned
+                                                    to you. Make sure to provide accurate information for proper
+                                                    tracking.</p>
+                                            </div>
+
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-check-circle me-2"></i>
+                                                <strong>Status Guide:</strong>
+                                                <ul class="mb-0 mt-2">
+                                                    <li><strong>Open:</strong> New issue reported</li>
+                                                    <li><strong>In Progress:</strong> Work being done</li>
+                                                    <li><strong>Resolved:</strong> Issue fixed</li>
+                                                    <li><strong>Closed:</strong> Issue completed</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Customer selection change handler
+        document.getElementById('customer_id').addEventListener('change', function () {
+            const customerInfo = document.getElementById('customer-info');
+            const selectedOption = this.options[this.selectedIndex];
+
+            if (this.value) {
+                // Show customer info
+                customerInfo.style.display = 'block';
+                customerInfo.innerHTML = `
+                    <h6 class="mb-2"><i class="fas fa-user me-2"></i>Selected Customer</h6>
+                    <p class="mb-1"><strong>${selectedOption.text}</strong></p>
+                    <small class="text-muted">Customer ID: ${this.value}</small>
+                `;
+            } else {
+                customerInfo.style.display = 'none';
+            }
+        });
+
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            const requiredFields = form.querySelectorAll('[required]');
+
+            form.addEventListener('submit', function (e) {
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields.');
+                }
+            });
+
+            // Remove invalid class on input
+            requiredFields.forEach(field => {
+                field.addEventListener('input', function () {
+                    if (this.value.trim()) {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+        });
+
+        // Character counter for description
+        document.getElementById('issue_description').addEventListener('input', function () {
+            const maxLength = 500;
+            const currentLength = this.value.length;
+            const remaining = maxLength - currentLength;
+
+            // You can add a character counter display if needed
+            if (currentLength > maxLength) {
+                this.value = this.value.substring(0, maxLength);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
 export interface ICustomer extends Document {
     customer_name: string;
@@ -8,14 +8,14 @@ export interface ICustomer extends Document {
     customer_city: string;
     customer_state: string;
     customer_zip: string;
-    attended_by: string;
+    attended_by: Types.ObjectId; // Reference to callers collection
     attended_at: Date;
     status: string;
     notes: string;    
 }
 
 export interface ITVissue extends Document {
-    customer_id: string;
+    customer_id: Types.ObjectId;
     issue_name: string;
     issue_description: string;
     issue_status: string;

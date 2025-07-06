@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/caller.css" rel="stylesheet">
+    <style>
+        .form-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-action {
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-control:focus {
+            border-color: #0d5b94;
+            box-shadow: 0 0 0 0.2rem rgba(13, 91, 148, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <%- include('./layout/sidebar', { currentPage: 'create-customer' }) %>
+
+                <!-- Main content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+                    <div class="container-fluid py-4">
+                        <!-- Header Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h2 class="mb-1">
+                                            <i class="fas fa-user-plus me-2 text-primary"></i>Create New Customer
+                                        </h2>
+                                        <p class="text-muted mb-0">Add a new customer to your list</p>
+                                    </div>
+                                    <div>
+                                        <a href="/caller/customers" class="btn btn-outline-secondary btn-action">
+                                            <i class="fas fa-arrow-left me-2"></i>Back to Customers
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <%- include('../common/flash-message') %>
+
+                            <!-- Form Section -->
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="form-card card">
+                                        <div class="card-header bg-white border-0">
+                                            <h5 class="mb-0 fw-bold">
+                                                <i class="fas fa-user-plus me-2 text-primary"></i>Customer Information
+                                            </h5>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <form action="/caller/create-customer" method="POST">
+                                                <div class="row">
+                                                    <!-- Customer Name -->
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="customer_name" class="form-label">
+                                                            <i class="fas fa-user me-2"></i>Customer Name *
+                                                        </label>
+                                                        <input type="text" class="form-control form-control-lg"
+                                                            id="customer_name" name="customer_name" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="customer_email" class="form-label">
+                                                            <i class="fas fa-envelope me-2"></i>Email Address
+                                                        </label>
+                                                        <input type="email" class="form-control form-control-lg"
+                                                            id="customer_email" name="customer_email">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="customer_phone" class="form-label">
+                                                            <i class="fas fa-phone me-2"></i>Phone Number
+                                                        </label>
+                                                        <input type="tel" class="form-control form-control-lg"
+                                                            id="customer_phone" name="customer_phone">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="status" class="form-label">
+                                                            <i class="fas fa-toggle-on me-2"></i>Status
+                                                        </label>
+                                                        <select class="form-select form-select-lg" id="status"
+                                                            name="status">
+                                                            <option value="active">Active</option>
+                                                            <option value="pending">Pending</option>
+                                                            <option value="resolved">Resolved</option>
+                                                            <option value="inactive">Inactive</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <label for="customer_address" class="form-label">
+                                                            <i class="fas fa-map-marker-alt me-2"></i>Address *
+                                                        </label>
+                                                        <textarea class="form-control" id="customer_address"
+                                                            name="customer_address" rows="3"
+                                                            placeholder="Enter full address" required></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-4 mb-3">
+                                                        <label for="customer_city" class="form-label">
+                                                            <i class="fas fa-city me-2"></i>City *
+                                                        </label>
+                                                        <input type="text" class="form-control form-control-lg"
+                                                            id="customer_city" name="customer_city" required>
+                                                    </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <label for="customer_state" class="form-label">
+                                                            <i class="fas fa-map me-2"></i>State/Province *
+                                                        </label>
+                                                        <input type="text" class="form-control form-control-lg"
+                                                            id="customer_state" name="customer_state" required>
+                                                    </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <label for="customer_zip" class="form-label">
+                                                            <i class="fas fa-mail-bulk me-2"></i>ZIP/Postal Code *
+                                                        </label>
+                                                        <input type="text" class="form-control form-control-lg"
+                                                            id="customer_zip" name="customer_zip" required>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <label for="notes" class="form-label">
+                                                            <i class="fas fa-sticky-note me-2"></i>Notes
+                                                        </label>
+                                                        <textarea class="form-control" id="notes" name="notes" rows="4"
+                                                            placeholder="Any additional notes about the customer"></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-flex justify-content-between">
+                                                    <button type="button" class="btn btn-outline-secondary btn-action"
+                                                        onclick="history.back()">
+                                                        <i class="fas fa-times me-2"></i>Cancel
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary btn-action">
+                                                        <i class="fas fa-save me-2"></i>Create Customer
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sidebar Info -->
+                                <div class="col-lg-4">
+                                    <div class="form-card card">
+                                        <div class="card-header bg-white border-0">
+                                            <h5 class="mb-0 fw-bold">
+                                                <i class="fas fa-info-circle me-2 text-primary"></i>Information
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-lightbulb me-2"></i>
+                                                <strong>Tips:</strong>
+                                                <ul class="mb-0 mt-2">
+                                                    <li>All fields marked with * are required</li>
+                                                    <li>Email and phone number are optional</li>
+                                                    <li>Phone number should include country code if provided</li>
+                                                    <li>Email must be unique if provided</li>
+                                                    <li>Customer will be automatically assigned to you</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-shield-alt me-2"></i>
+                                                <strong>Privacy:</strong>
+                                                <p class="mb-0 mt-2">All customer information will be stored securely
+                                                    and used only for service purposes.</p>
+                                            </div>
+
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-user-check me-2"></i>
+                                                <strong>Assignment:</strong>
+                                                <p class="mb-0 mt-2">This customer will be automatically assigned to
+                                                    your account as the attending caller.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            const requiredFields = form.querySelectorAll('[required]');
+
+            form.addEventListener('submit', function (e) {
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields.');
+                }
+            });
+
+            // Remove invalid class on input
+            requiredFields.forEach(field => {
+                field.addEventListener('input', function () {
+                    if (this.value.trim()) {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+        });
+
+        // Phone number formatting
+        document.getElementById('customer_phone').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                value = '+' + value;
+            }
+            e.target.value = value;
+        });
+
+        // Email validation (only if email is provided)
+        document.getElementById('customer_email').addEventListener('blur', function () {
+            const email = this.value.trim();
+            if (email && !email.includes('@')) {
+                this.classList.add('is-invalid');
+                this.setCustomValidity('Please enter a valid email address');
+            } else {
+                this.classList.remove('is-invalid');
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+
+</html>

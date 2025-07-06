@@ -6,6 +6,7 @@ import envConfig from "./app/config/env.config";
 import { connectDB } from "./app/config/db.connection";
 import basicRouter from "./app/routes/basic.route";
 import adminRouter from "./app/routes/admin.route";
+import callerRouter from "./app/routes/caller.route";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -56,6 +57,7 @@ app.use((req, res, next) => {
 
 app.use("/any-prefix", basicRouter);
 app.use("/admin", adminRouter);
+app.use("/caller", callerRouter);
 
 //this is the global erro handler middleware , it should always be at the buttom of all rotes
 app.use(errorHandler);
