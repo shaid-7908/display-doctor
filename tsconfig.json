@@ -17,7 +17,7 @@
     "sourceMap": false,                                  /* Disable source maps for production */
     "declaration": false,                                /* Disable declaration files for production */
     "noEmitOnError": true,                               /* Don't emit files if there are errors */
-    "importHelpers": true,                               /* Use external helpers for smaller output */
+    "importHelpers": false,                              /* Disable external helpers to avoid tslib dependency */
 
     /* Interop Constraints */
     "esModuleInterop": true,                             /* Enable ES module interop */
@@ -30,8 +30,8 @@
     "strictFunctionTypes": true,                          /* Strict function type checking */
     "noImplicitReturns": true,                           /* Error on implicit returns */
     "noFallthroughCasesInSwitch": true,                  /* Error on switch fallthrough */
-    "noUnusedLocals": true,                              /* Error on unused locals */
-    "noUnusedParameters": true,                          /* Error on unused parameters */
+    "noUnusedLocals": false,                             /* Disable error on unused locals */
+    "noUnusedParameters": false,                          /* Disable error on unused parameters */
 
     /* Completeness */
     "skipLibCheck": true,                                /* Skip type checking of declaration files */

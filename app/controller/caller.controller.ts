@@ -20,7 +20,7 @@ class CallerController {
 
     // Find caller by email
     const caller = await CallerModel.findOne({ email });
-
+    console.log(caller,'caller');
     if (!caller) {
       req.flash("error_msg", "Invalid email or password");
       return res.redirect("/caller/login");
