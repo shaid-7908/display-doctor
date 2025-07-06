@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Create New Admin
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <%- include('../common/flash-message') %>
+                        
+                        <form action="/admin/create" method="POST" >
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="ad_user_name" class="form-label">Username *</label>
+                                    <input type="text" class="form-control" id="ad_user_name" name="ad_user_name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="ad_email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="ad_email" name="ad_email" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="ad_password" class="form-label">Password *</label>
+                                    <input type="password" class="form-control" id="ad_password" name="ad_password" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="ad_phone" class="form-label">Phone *</label>
+                                    <input type="tel" class="form-control" id="ad_phone" name="ad_phone" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="ad_role" class="form-label">Role</label>
+                                    <select class="form-select" id="ad_role" name="ad_role">
+                                        <option value="admin">Admin</option>
+                                        <option value="super_admin">Super Admin</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="ad_profile_picture" class="form-label">Profile Picture</label>
+                                    <input type="file" class="form-control" id="ad_profile_picture" name="ad_profile_picture" accept="image/*">
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="/admin/list" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to List
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Create Admin
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

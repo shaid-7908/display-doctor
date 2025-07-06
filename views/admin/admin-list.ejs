@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/admin.css" rel="stylesheet">
+</head>
+<body >
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <%- include('./layout/sidebard') %>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+                <div class="container-fluid py-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card shadow">
+                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                    <h4 class="mb-0">
+                                        <i class="fas fa-users me-2"></i>
+                                        Admin List
+                                    </h4>
+                                    <a href="/admin/create" class="btn btn-light">
+                                        <i class="fas fa-plus me-2"></i>Add New Admin
+                                    </a>
+                                </div>
+                                <div class="card-body">
+                                    <%- include('../common/flash-message') %>
+                    
+                                        <% if (admins && admins.length> 0) { %>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped table-hover">
+                                                    <thead class="table-dark">
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Profile</th>
+                                                            <th>Username</th>
+                                                            <th>Email</th>
+                                                            <th>Phone</th>
+                                                            <th>Role</th>
+                                                            <th>Status</th>
+                                                            <th>Created</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% admins.forEach((admin, index)=> { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= index + 1 %>
+                                                                </td>
+                                                                <td>
+                                                                    <% if (admin.ad_profile_picture) { %>
+                                                                        <img src="/uploads/<%= admin.ad_profile_picture %>" alt="Profile"
+                                                                            class="rounded-circle" width="40" height="40">
+                                                                        <% } else { %>
+                                                                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center"
+                                                                                style="width: 40px; height: 40px;">
+                                                                                <i class="fas fa-user text-white"></i>
+                                                                            </div>
+                                                                            <% } %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= admin.ad_user_name %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= admin.ad_email %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= admin.ad_phone %>
+                                                                </td>
+                                                                <td>
+                                                                    <span
+                                                                        class="badge <%= admin.ad_role === 'super_admin' ? 'bg-danger' : 'bg-primary' %>">
+                                                                        <%= admin.ad_role %>
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span
+                                                                        class="badge <%= admin.is_active ? 'bg-success' : 'bg-secondary' %>">
+                                                                        <%= admin.is_active ? 'Active' : 'Inactive' %>
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <%= new Date(admin.created_at).toLocaleDateString() %>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="btn-group" role="group">
+                                                                        <a href="/admin/edit/<%= admin._id %>"
+                                                                            class="btn btn-sm btn-outline-primary" title="Edit">
+                                                                            <i class="fas fa-edit"></i>
+                                                                        </a>
+                                                                        <form action="/admin/toggle-status/<%= admin._id %>" method="POST"
+                                                                            style="display: inline;">
+                                                                            <button type="submit"
+                                                                                class="btn btn-sm <%= admin.is_active ? 'btn-outline-warning' : 'btn-outline-success' %>"
+                                                                                title="<%= admin.is_active ? 'Deactivate' : 'Activate' %>">
+                                                                                <i
+                                                                                    class="fas <%= admin.is_active ? 'fa-ban' : 'fa-check' %>"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                        <form action="/admin/delete/<%= admin._id %>" method="POST"
+                                                                            style="display: inline;"
+                                                                            onsubmit="return confirm('Are you sure you want to delete this admin?')">
+                                                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                                title="Delete">
+                                                                                <i class="fas fa-trash"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <% }); %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <% } else { %>
+                                                <div class="text-center py-5">
+                                                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                                    <h5 class="text-muted">No admins found</h5>
+                                                    <p class="text-muted">Start by creating your first admin.</p>
+                                                    <a href="/admin/create" class="btn btn-primary">
+                                                        <i class="fas fa-plus me-2"></i>Create First Admin
+                                                    </a>
+                                                </div>
+                                                <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+    <div class="container mt-5">
+
+        
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,42 @@
+<nav class="col-md-3 col-lg-2 sidebar d-md-block">
+    <div class="position-sticky pt-4">
+        <div class="text-center mb-4 px-3">
+            <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                style="width: 60px; height: 60px;">
+                <i class="fas fa-user-shield fa-2x text-primary"></i>
+            </div>
+            <h5 class="text-white mb-1">Admin Panel</h5>
+            <small class="text-white-50">Welcome back, <%= admin.username %></small>
+        </div>
+
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="/admin/dashboard">
+                    <i class="fas fa-tachometer-alt me-3"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/list">
+                    <i class="fas fa-users me-3"></i>Admin List
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/create-caller">
+                    <i class="fas fa-user me-3"></i>Caller
+                </a>
+            </li>
+            <% if (admin.role==='super_admin' ) { %>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/create">
+                        <i class="fas fa-user-plus me-3"></i>Create Admin
+                    </a>
+                </li>
+                <% } %>
+                    <li class="nav-item mt-4">
+                        <a class="nav-link text-danger" href="/admin/logout">
+                            <i class="fas fa-sign-out-alt me-3"></i>Logout
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</nav>
