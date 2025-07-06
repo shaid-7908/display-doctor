@@ -1,8 +1,26 @@
 import mongoose, { Schema, model } from "mongoose";
 import { ICustomer } from "../types/customer.types";
 
+// Define interface for customer schema statics
+interface ICustomerModel extends mongoose.Model<ICustomer> {
+  findByStatus(status: string): Promise<ICustomer[]>;
+  searchCustomers(searchTerm: string): Promise<ICustomer[]>;
+  findByAttendant(attendant: string): Promise<ICustomer[]>;
+  findByDateRange(startDate: Date, endDate: Date): Promise<ICustomer[]>;
+  findByCode(code: string): Promise<ICustomer | null>;
+  generateCustomerCode(): Promise<string>;
+}
+
 const customerSchema = new Schema<ICustomer>(
   {
+    customer_code: { 
+      type: String, 
+      required: true, 
+      unique: true,
+      trim: true,
+      uppercase: true,
+      maxlength: 12 
+    },
     customer_name: { 
       type: String, 
       required: true, 
@@ -58,8 +76,8 @@ const customerSchema = new Schema<ICustomer>(
     },
     status: { 
       type: String, 
-      enum: ["active", "inactive", "pending", "resolved"], 
-      default: "active" 
+      enum: ["intrested", "not_intrested", "pending", "resolved","query_raised"], 
+      default: "intrested" 
     },
     notes: { 
       type: String, 
@@ -76,6 +94,7 @@ const customerSchema = new Schema<ICustomer>(
 );
 
 // Create indexes for efficient querying
+customerSchema.index({ customer_code: 1 });
 customerSchema.index({ customer_name: 1 });
 customerSchema.index({ customer_email: 1 });
 customerSchema.index({ customer_phone: 1 });
@@ -83,6 +102,65 @@ customerSchema.index({ status: 1 });
 customerSchema.index({ customer_city: 1, customer_state: 1 });
 customerSchema.index({ attended_by: 1 });
 customerSchema.index({ attended_at: 1 });
+
+// Function to generate unique customer code
+export async function generateCustomerCode(): Promise<string> {
+  try {
+    const prefix = 'CUST';
+    const year = new Date().getFullYear().toString().slice(-2); // Last 2 digits of year
+    
+    // Get the latest customer code for this year
+    const latestCustomer = await CustomerModel.findOne({
+      customer_code: { $regex: `^${prefix}${year}` }
+    }).sort({ customer_code: -1 });
+    
+    let sequence = 1;
+    if (latestCustomer) {
+      // Extract sequence number from the latest code (e.g., CUST24000001 -> 1)
+      const lastSequence = parseInt(latestCustomer.customer_code.slice(-5));
+      sequence = lastSequence + 1;
+    }
+    
+    // Format: CUST + YY + 5-digit sequence (e.g., CUST24000001, CUST24000002, etc.)
+    const generatedCode = `${prefix}${year}${sequence.toString().padStart(5, '0')}`;
+    console.log("Generated customer code:", generatedCode);
+    return generatedCode;
+  } catch (error) {
+    console.error("Error generating customer code:", error);
+    throw error;
+  }
+}
+
+// Pre-save middleware to generate customer code if not provided
+customerSchema.pre('save', async function(next) {
+  try {
+    // Generate customer code if not already set
+    if (!this.customer_code) {
+      this.customer_code = await generateCustomerCode();
+    }
+    
+    // Ensure phone number has country code if not already present
+    if (this.customer_phone && !this.customer_phone.startsWith('+')) {
+      // Add +1 for US numbers if not present
+      if (this.customer_phone.replace(/\D/g, '').length === 10) {
+        this.customer_phone = '+1' + this.customer_phone;
+      }
+    }
+    
+    // Capitalize city and state
+    if (this.customer_city) {
+      this.customer_city = this.customer_city.charAt(0).toUpperCase() + this.customer_city.slice(1).toLowerCase();
+    }
+    
+    if (this.customer_state) {
+      this.customer_state = this.customer_state.toUpperCase();
+    }
+    
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
 
 // Virtual for full address
 customerSchema.virtual('fullAddress').get(function() {
@@ -117,28 +195,6 @@ customerSchema.virtual('formattedPhone').get(function() {
 customerSchema.set('toJSON', { virtuals: true });
 customerSchema.set('toObject', { virtuals: true });
 
-// Pre-save middleware to validate data
-customerSchema.pre('save', function(next) {
-  // Ensure phone number has country code if not already present
-  if (this.customer_phone && !this.customer_phone.startsWith('+')) {
-    // Add +1 for US numbers if not present
-    if (this.customer_phone.replace(/\D/g, '').length === 10) {
-      this.customer_phone = '+1' + this.customer_phone;
-    }
-  }
-  
-  // Capitalize city and state
-  if (this.customer_city) {
-    this.customer_city = this.customer_city.charAt(0).toUpperCase() + this.customer_city.slice(1).toLowerCase();
-  }
-  
-  if (this.customer_state) {
-    this.customer_state = this.customer_state.toUpperCase();
-  }
-  
-  next();
-});
-
 // Static method to find customers by status
 customerSchema.statics.findByStatus = function(status: string) {
   return this.find({ status });
@@ -148,6 +204,7 @@ customerSchema.statics.findByStatus = function(status: string) {
 customerSchema.statics.searchCustomers = function(searchTerm: string) {
   return this.find({
     $or: [
+      { customer_code: { $regex: searchTerm, $options: 'i' } },
       { customer_name: { $regex: searchTerm, $options: 'i' } },
       { customer_email: { $regex: searchTerm, $options: 'i' } },
       { customer_phone: { $regex: searchTerm, $options: 'i' } },
@@ -172,5 +229,12 @@ customerSchema.statics.findByDateRange = function(startDate: Date, endDate: Date
   });
 };
 
+// Static method to find customer by code
+customerSchema.statics.findByCode = function(code: string) {
+  return this.findOne({ customer_code: code.toUpperCase() });
+};
 
-export const CustomerModel = model<ICustomer>("customers", customerSchema);
+// Static method to generate customer code
+customerSchema.statics.generateCustomerCode = generateCustomerCode;
+
+export const CustomerModel = model<ICustomer, ICustomerModel>("customers", customerSchema);

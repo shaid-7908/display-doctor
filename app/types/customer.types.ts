@@ -1,6 +1,7 @@
 import { Document, Types } from "mongoose";
 
 export interface ICustomer extends Document {
+    customer_code: string;
     customer_name: string;
     customer_email: string;
     customer_phone: string;
@@ -15,6 +16,7 @@ export interface ICustomer extends Document {
 }
 
 export interface ITVissue extends Document {
+    issue_code: string;
     customer_id: Types.ObjectId;
     issue_name: string;
     issue_description: string;
@@ -23,4 +25,7 @@ export interface ITVissue extends Document {
     tv_serial_number: string;
     tv_size: string;
     issue_notes: string;
+    visit_date: Date;
+    visit_time_range: string;
+    forward_status: string;
 }

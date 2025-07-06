@@ -16,8 +16,11 @@ router.post("/profile", authenticateCaller, upload.single('profileImage'), calle
 router.get("/customers", authenticateCaller, callerController.renderCallerCustomers);
 router.get("/create-customer", authenticateCaller, callerController.renderCreateCustomerForm);
 router.post("/create-customer", authenticateCaller, callerController.createCustomer);
-router.get("/create-issue", authenticateCaller, callerController.renderCreateIssueForm);
-router.post("/create-issue", authenticateCaller, callerController.createIssue);
+router.get("/create-issue/:customerId", authenticateCaller, callerController.renderCreateIssueForm);
+router.post("/create-issue/:customerId", authenticateCaller, callerController.createIssue);
+router.get("/issues", authenticateCaller, callerController.renderCallerIssues);
+router.get("/customer/:customerId", authenticateCaller, callerController.renderCustomerDetails);
+router.get("/send-mail/:issueId", authenticateCaller, callerController.sendIssueEmail);
 router.get("/logout", authenticateCaller, callerController.callerLogout);
 
 export default router; 

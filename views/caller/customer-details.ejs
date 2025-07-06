@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/caller.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <%- include('./layout/sidebar', { currentPage: 'customers' }) %>
+
+                <!-- Main content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+                    <div class="container-fluid py-4">
+                        <!-- Header Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h2 class="mb-1">
+                                            <i class="fas fa-user me-2 text-primary"></i>
+                                            <%= customer.customer_name %>
+                                        </h2>
+                                        <p class="text-muted mb-0">Customer Details & TV Issues</p>
+                                    </div>
+                                    <div>
+                                        <a href="/caller/customers" class="btn btn-outline-secondary btn-action">
+                                            <i class="fas fa-arrow-left me-2"></i>Back to Customers
+                                        </a>
+                                        <a href="/caller/create-issue/<%= customer._id %>"
+                                            class="btn btn-primary btn-action ms-2">
+                                            <i class="fas fa-tv me-2"></i>Create TV Issue
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <%- include('../common/flash-message') %>
+
+                            <!-- Customer Information -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="customer-info">
+                                        <h6 class="mb-3">
+                                            <i class="fas fa-user me-2 text-primary"></i>Customer Information
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>Code:</strong>
+                                                    <span class="badge bg-secondary">
+                                                        <i class="fas fa-tag me-1"></i>
+                                                        <%= customer.customer_code %>
+                                                    </span>
+                                                </p>
+                                                <p><strong>Name:</strong>
+                                                    <%= customer.customer_name %>
+                                                </p>
+                                                <% if (customer.customer_email) { %>
+                                                    <p><strong>Email:</strong>
+                                                        <%= customer.customer_email %>
+                                                    </p>
+                                                    <% } %>
+                                                        <% if (customer.customer_phone) { %>
+                                                            <p><strong>Phone:</strong>
+                                                                <%= customer.customer_phone %>
+                                                            </p>
+                                                            <% } %>
+                                                                <p><strong>Status:</strong>
+                                                                    <span
+                                                                        class="badge bg-<%= customer.status === 'active' ? 'success' : 
+                                                                          customer.status === 'resolved' ? 'primary' : 
+                                                                          customer.status === 'pending' ? 'warning' : 'secondary' %>">
+                                                                        <%= customer.status.charAt(0).toUpperCase() +
+                                                                            customer.status.slice(1) %>
+                                                                    </span>
+                                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>Address:</strong>
+                                                    <%= customer.customer_address %>
+                                                </p>
+                                                <p><strong>Location:</strong>
+                                                    <%= customer.customer_city %>, <%= customer.customer_state %>
+                                                            <%= customer.customer_zip %>
+                                                </p>
+                                                <p><strong>Added:</strong>
+                                                    <%= new Date(customer.attended_at).toLocaleDateString() %>
+                                                </p>
+                                                <% if (customer.notes) { %>
+                                                    <p><strong>Notes:</strong>
+                                                        <%= customer.notes %>
+                                                    </p>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Statistics Cards -->
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="stats-card">
+                                        <div class="text-center">
+                                            <i class="fas fa-tv stats-icon"></i>
+                                            <div class="stats-number">
+                                                <%= stats.totalIssues %>
+                                            </div>
+                                            <div class="stats-label">Total Issues</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stats-card">
+                                        <div class="text-center">
+                                            <i class="fas fa-exclamation-circle stats-icon"></i>
+                                            <div class="stats-number">
+                                                <%= stats.openIssues %>
+                                            </div>
+                                            <div class="stats-label">Open Issues</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stats-card">
+                                        <div class="text-center">
+                                            <i class="fas fa-clock stats-icon"></i>
+                                            <div class="stats-number">
+                                                <%= stats.inProgressIssues %>
+                                            </div>
+                                            <div class="stats-label">In Progress</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stats-card">
+                                        <div class="text-center">
+                                            <i class="fas fa-check-circle stats-icon"></i>
+                                            <div class="stats-number">
+                                                <%= stats.resolvedIssues %>
+                                            </div>
+                                            <div class="stats-label">Resolved</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TV Issues Section -->
+                            <div class="form-card card">
+                                <div class="card-header bg-white border-0">
+                                    <h5 class="mb-0 fw-bold">
+                                        <i class="fas fa-tv me-2 text-primary"></i>TV Issues
+                                        <span class="badge bg-primary ms-2">
+                                            <%= issues.length %>
+                                        </span>
+                                    </h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <% if (issues.length===0) { %>
+                                        <div class="text-center py-5">
+                                            <i class="fas fa-tv fa-3x text-muted mb-3"></i>
+                                            <h5 class="text-muted">No TV Issues Found</h5>
+                                            <p class="text-muted">This customer doesn't have any TV issues yet.</p>
+                                            <a href="/caller/create-issue/<%= customer._id %>" class="btn btn-primary">
+                                                <i class="fas fa-tv me-1"></i>Create First Issue
+                                            </a>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>
+                                                                <i class="fas fa-hashtag me-1"></i>Code
+                                                            </th>
+                                                            <th>
+                                                                <i class="fas fa-hashtag me-1"></i>Issue
+                                                            </th>
+                                                            <th>
+                                                                <i class="fas fa-tv me-1"></i>TV Details
+                                                            </th>
+                                                            <th>
+                                                                <i class="fas fa-info-circle me-1"></i>Status
+                                                            </th>
+                                                            <th>
+                                                                <i class="fas fa-calendar me-1"></i>Created
+                                                            </th>
+                                                            <th>
+                                                                <i class="fas fa-cogs me-1"></i>Actions
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% issues.forEach(issue=> { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <span class="badge bg-secondary">
+                                                                        <i class="fas fa-tag me-1"></i>
+                                                                        <%= issue.issue_code %>
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <div>
+                                                                        <strong class="text-primary">
+                                                                            <%= issue.issue_name %>
+                                                                        </strong>
+                                                                        <br>
+                                                                        <small class="text-muted">
+                                                                            <%= issue.issue_description.length> 50 ?
+                                                                                issue.issue_description.substring(0, 50)
+                                                                                + '...' :
+                                                                                issue.issue_description %>
+                                                                        </small>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div>
+                                                                        <% if (issue.tv_model) { %>
+                                                                            <strong>
+                                                                                <%= issue.tv_model %>
+                                                                            </strong><br>
+                                                                            <% } %>
+                                                                                <% if (issue.tv_serial_number) { %>
+                                                                                    <small class="text-muted">
+                                                                                        <i
+                                                                                            class="fas fa-barcode me-1"></i>S/N:
+                                                                                        <%= issue.tv_serial_number %>
+                                                                                    </small><br>
+                                                                                    <% } %>
+                                                                                        <% if (issue.tv_size) { %>
+                                                                                            <small class="text-muted">
+                                                                                                <i
+                                                                                                    class="fas fa-expand me-1"></i>
+                                                                                                <%= issue.tv_size %>"
+                                                                                            </small>
+                                                                                            <% } %>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="badge bg-<%= 
+                                                            issue.issue_status === 'open' ? 'danger' :
+                                                            issue.issue_status === 'in_progress' ? 'warning' :
+                                                            issue.issue_status === 'resolved' ? 'success' :
+                                                            issue.issue_status === 'closed' ? 'secondary' : 'primary'
+                                                        %> status-badge">
+                                                                        <i class="fas fa-<%= 
+                                                                issue.issue_status === 'open' ? 'exclamation-circle' :
+                                                                issue.issue_status === 'in_progress' ? 'clock' :
+                                                                issue.issue_status === 'resolved' ? 'check-circle' :
+                                                                issue.issue_status === 'closed' ? 'times-circle' : 'info-circle'
+                                                            %> me-1"></i>
+                                                                        <%= issue.issue_status.charAt(0).toUpperCase() +
+                                                                            issue.issue_status.slice(1).replace('_', ' '
+                                                                            ) %>
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <div>
+                                                                        <small class="text-muted">
+                                                                            <i class="fas fa-calendar me-1"></i>
+                                                                            <%= new
+                                                                                Date(issue.created_at).toLocaleDateString()
+                                                                                %>
+                                                                        </small>
+                                                                        <br>
+                                                                        <small class="text-muted">
+                                                                            <i class="fas fa-clock me-1"></i>
+                                                                            <%= new
+                                                                                Date(issue.created_at).toLocaleTimeString()
+                                                                                %>
+                                                                        </small>
+                                                                        <% if (issue.visit_date) { %>
+                                                                            <br>
+                                                                            <small class="text-success">
+                                                                                <i
+                                                                                    class="fas fa-calendar-check me-1"></i>
+                                                                                Visit: <%= new
+                                                                                    Date(issue.visit_date).toLocaleDateString()
+                                                                                    %>
+                                                                                    <% if (issue.visit_time_range) { %>
+                                                                                        <br><i
+                                                                                            class="fas fa-clock me-1"></i>
+                                                                                        <%= issue.visit_time_range %>
+                                                                                            <% } %>
+                                                                            </small>
+                                                                            <% } %>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="btn-group" role="group">
+                                                                        <button type="button"
+                                                                            class="btn btn-sm btn-outline-primary"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#issueModal<%= issue._id %>">
+                                                                            <i class="fas fa-eye"></i>
+                                                                        </button>
+                                                                        <a href="/caller/edit-issue/<%= issue._id %>"
+                                                                            class="btn btn-sm btn-outline-warning">
+                                                                            <i class="fas fa-edit"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <!-- Issue Details Modal -->
+                                                            <div class="modal fade" id="issueModal<%= issue._id %>"
+                                                                tabindex="-1">
+                                                                <div class="modal-dialog modal-lg">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title">
+                                                                                <i
+                                                                                    class="fas fa-tv me-2 text-primary"></i>
+                                                                                <%= issue.issue_name %>
+                                                                            </h5>
+                                                                            <button type="button" class="btn-close"
+                                                                                data-bs-dismiss="modal"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <div class="row">
+                                                                                <div class="col-md-6">
+                                                                                    <h6 class="text-primary">Issue
+                                                                                        Details</h6>
+                                                                                    <p><strong>Description:</strong></p>
+                                                                                    <p class="text-muted">
+                                                                                        <%= issue.issue_description %>
+                                                                                    </p>
+
+                                                                                    <% if (issue.issue_notes) { %>
+                                                                                        <p><strong>Notes:</strong></p>
+                                                                                        <p class="text-muted">
+                                                                                            <%= issue.issue_notes %>
+                                                                                        </p>
+                                                                                        <% } %>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <h6 class="text-primary">TV
+                                                                                        Information</h6>
+                                                                                    <% if (issue.tv_model) { %>
+                                                                                        <p><strong>Model:</strong>
+                                                                                            <%= issue.tv_model %>
+                                                                                        </p>
+                                                                                        <% } %>
+                                                                                            <% if
+                                                                                                (issue.tv_serial_number)
+                                                                                                { %>
+                                                                                                <p><strong>Serial
+                                                                                                        Number:</strong>
+                                                                                                    <%= issue.tv_serial_number
+                                                                                                        %>
+                                                                                                </p>
+                                                                                                <% } %>
+                                                                                                    <% if
+                                                                                                        (issue.tv_size)
+                                                                                                        { %>
+                                                                                                        <p><strong>Size:</strong>
+                                                                                                            <%= issue.tv_size
+                                                                                                                %>"
+                                                                                                        </p>
+                                                                                                        <% } %>
+                                                                                                            <p><strong>Status:</strong>
+                                                                                                                <span
+                                                                                                                    class="badge bg-<%= 
+                                                                                issue.issue_status === 'open' ? 'danger' :
+                                                                                issue.issue_status === 'in_progress' ? 'warning' :
+                                                                                issue.issue_status === 'resolved' ? 'success' :
+                                                                                issue.issue_status === 'closed' ? 'secondary' : 'primary'
+                                                                            %>">
+                                                                                                                    <%= issue.issue_status.charAt(0).toUpperCase()
+                                                                                                                        +
+                                                                                                                        issue.issue_status.slice(1).replace('_', ' '
+                                                                                                                        )
+                                                                                                                        %>
+                                                                                                                </span>
+                                                                                                            </p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button"
+                                                                                class="btn btn-secondary"
+                                                                                data-bs-dismiss="modal">Close</button>
+                                                                            <a href="/caller/edit-issue/<%= issue._id %>"
+                                                                                class="btn btn-primary">
+                                                                                <i class="fas fa-edit me-1"></i>Edit
+                                                                                Issue
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <% }); %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <% } %>
+                                </div>
+                            </div>
+                    </div>
+                </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

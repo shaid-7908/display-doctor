@@ -175,3 +175,38 @@
     border-color: #0d5b94;
     box-shadow: 0 0 0 0.2rem rgba(13, 91, 148, 0.25);
 }
+
+/* Customer Information Display */
+.customer-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #0d5b94;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.customer-info h6 {
+    color: #0a3d62;
+    font-weight: 700;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #0d5b94;
+    padding-bottom: 8px;
+}
+
+.customer-info p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.customer-info strong {
+    color: #0a3d62;
+    font-weight: 600;
+}
+
+.customer-info .badge {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}

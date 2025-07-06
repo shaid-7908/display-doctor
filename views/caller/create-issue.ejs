@@ -10,42 +10,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/css/caller.css" rel="stylesheet">
-    <style>
-        .form-card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-action {
-            border-radius: 10px;
-            padding: 12px 25px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .btn-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .form-control:focus {
-            border-color: #0d5b94;
-            box-shadow: 0 0 0 0.2rem rgba(13, 91, 148, 0.25);
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .customer-info {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
 
 <body>
@@ -88,34 +52,54 @@
                                             </h5>
                                         </div>
                                         <div class="card-body p-4">
-                                            <form action="/caller/create-issue" method="POST">
+                                            <form action="/caller/create-issue/<%= customer._id %>" method="POST">
                                                 <!-- Customer Selection -->
                                                 <div class="row mb-4">
                                                     <div class="col-12">
-                                                        <label for="customer_id" class="form-label">
-                                                            <i class="fas fa-user me-2"></i>Select Customer *
-                                                        </label>
-                                                        <select class="form-select form-select-lg" id="customer_id"
-                                                            name="customer_id" required>
-                                                            <option value="">Choose a customer...</option>
-                                                            <% customers.forEach(customer=> { %>
-                                                                <option value="<%= customer._id %>">
-                                                                    <%= customer.customer_name %>
-                                                                        <% if (customer.customer_email) { %>
-                                                                            (<%= customer.customer_email %>)
+                                                        <div class="customer-info">
+                                                            <h6 class="mb-3">
+                                                                <i class="fas fa-user me-2 text-primary"></i>Customer
+                                                                Information (<%= customer.customer_code %>)
+                                                            </h6>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <p class="mb-1"><strong>Name:</strong>
+                                                                        <%= customer.customer_name %>
+                                                                    </p>
+                                                                    <% if (customer.customer_email) { %>
+                                                                        <p class="mb-1"><strong>Email:</strong>
+                                                                            <%= customer.customer_email %>
+                                                                        </p>
+                                                                        <% } %>
+                                                                            <% if (customer.customer_phone) { %>
+                                                                                <p class="mb-1"><strong>Phone:</strong>
+                                                                                    <%= customer.customer_phone %>
+                                                                                </p>
                                                                                 <% } %>
-                                                                                    <% if (customer.customer_city) { %>
-                                                                                        - <%= customer.customer_city %>,
-                                                                                            <%= customer.customer_state
-                                                                                                %>
-                                                                                                <% } %>
-                                                                </option>
-                                                                <% }); %>
-                                                        </select>
-                                                        <div id="customer-info" class="customer-info"
-                                                            style="display: none;">
-                                                            <!-- Customer details will be populated here -->
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <p class="mb-1"><strong>Address:</strong>
+                                                                        <%= customer.customer_address %>
+                                                                    </p>
+                                                                    <p class="mb-1"><strong>Location:</strong>
+                                                                        <%= customer.customer_city %>, <%=
+                                                                                customer.customer_state %>
+                                                                                <%= customer.customer_zip %>
+                                                                    </p>
+                                                                    <p class="mb-1"><strong>Status:</strong>
+                                                                        <span
+                                                                            class="badge bg-<%= customer.status === 'active' ? 'success' : 
+                                                                                              customer.status === 'resolved' ? 'primary' : 
+                                                                                              customer.status === 'pending' ? 'warning' : 'secondary' %>">
+                                                                            <%= customer.status.charAt(0).toUpperCase()
+                                                                                + customer.status.slice(1) %>
+                                                                        </span>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
                                                         </div>
+                                                        <input type="hidden" name="customer_id"
+                                                            value="<%= customer._id %>">
                                                     </div>
                                                 </div>
 
@@ -138,6 +122,7 @@
                                                             <option value="in_progress">In Progress</option>
                                                             <option value="resolved">Resolved</option>
                                                             <option value="closed">Closed</option>
+                                                            <option value="visit_scheduled">Visit Scheduled</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -189,6 +174,69 @@
                                                         <textarea class="form-control" id="issue_notes"
                                                             name="issue_notes" rows="3"
                                                             placeholder="Any additional notes or special instructions..."></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Visit Scheduling (Optional) -->
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <div class="card border-primary">
+                                                            <div class="card-header bg-primary text-white">
+                                                                <h6 class="mb-0">
+                                                                    <i class="fas fa-calendar-alt me-2"></i>Visit
+                                                                    Scheduling (Optional)
+                                                                </h6>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <div class="row">
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="visit_date" class="form-label">
+                                                                            <i class="fas fa-calendar me-2"></i>Visit
+                                                                            Date
+                                                                        </label>
+                                                                        <input type="date"
+                                                                            class="form-control form-control-lg"
+                                                                            id="visit_date" name="visit_date"
+                                                                            min="<%= new Date().toISOString().split('T')[0] %>">
+                                                                        <small class="text-muted">Select a date for the
+                                                                            visit (optional)</small>
+                                                                    </div>
+                                                                    <div class="col-md-6 mb-3">
+                                                                        <label for="visit_time_range"
+                                                                            class="form-label">
+                                                                            <i class="fas fa-clock me-2"></i>Visit Time
+                                                                            Range
+                                                                        </label>
+                                                                        <select class="form-select form-select-lg"
+                                                                            id="visit_time_range"
+                                                                            name="visit_time_range">
+                                                                            <option value="">Select time range
+                                                                                (optional)</option>
+                                                                            <option value="8:00 AM - 10:00 AM">8:00 AM -
+                                                                                10:00 AM</option>
+                                                                            <option value="10:00 AM - 12:00 PM">10:00 AM
+                                                                                - 12:00 PM</option>
+                                                                            <option value="12:00 PM - 2:00 PM">12:00 PM
+                                                                                - 2:00 PM</option>
+                                                                            <option value="2:00 PM - 4:00 PM">2:00 PM -
+                                                                                4:00 PM</option>
+                                                                            <option value="4:00 PM - 6:00 PM">4:00 PM -
+                                                                                6:00 PM</option>
+                                                                            <option value="6:00 PM - 8:00 PM">6:00 PM -
+                                                                                8:00 PM</option>
+                                                                        </select>
+                                                                        <small class="text-muted">Choose a 2-hour time
+                                                                            slot</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="alert alert-info mb-0">
+                                                                    <i class="fas fa-info-circle me-2"></i>
+                                                                    <strong>Note:</strong> Visit scheduling is optional.
+                                                                    You can schedule a visit later or leave these fields
+                                                                    empty.
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
 
