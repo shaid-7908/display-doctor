@@ -4,15 +4,15 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only server.ts",
-    "build": "tsc",
-    "build:clean": "if exist dist rmdir /s /q dist && tsc",
-    "build:prod": "npm run build:clean && npm run copy-assets",
-    "copy-assets": "mkdir dist\\views dist\\public dist\\uploads && xcopy views dist\\views /E /I /Y && xcopy public dist\\public /E /I /Y && xcopy uploads dist\\uploads /E /I /Y",
-    "start": "node dist/server.js",
-    "start:prod": "set NODE_ENV=production && node dist/server.js"
-  },
+  "dev": "ts-node-dev --respawn --transpile-only server.ts",
+  "build": "tsc",
+  "build:clean": "rm -rf dist && tsc",
+  "build:prod": "npm run build:clean && npm run copy-assets",
+  "copy-assets": "mkdir -p dist/views dist/public dist/uploads && cp -r views/* dist/views && cp -r public/* dist/public && [ -d uploads ] && cp -r uploads/* dist/uploads || true",
+  "start": "node dist/server.js",
+  "start:prod": "NODE_ENV=production node dist/server.js"
+}
+,
   "keywords": [],
   "author": "",
   "license": "ISC",
