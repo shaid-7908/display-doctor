@@ -1,49 +1,103 @@
-<nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-    <div class="position-sticky pt-3">
-        <div class="text-center mb-4">
-            <img src="https://res.cloudinary.com/dycvkezau/image/upload/v1751786166/WhatsApp_Image_2025-07-03_at_10.39.29_245bf40b-removebg-preview_iwumxs.png"
-                alt="Company Logo" style="max-width: 120px; height: auto; margin: 0 auto;">
-            <h5 class="text-white mt-2">Caller Portal</h5>
-        </div>
-
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link <%= currentPage === 'dashboard' ? 'active' : '' %>" href="/caller/dashboard">
-                    <i class="fas fa-tachometer-alt me-2"></i>
-                    Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= currentPage === 'customers' ? 'active' : '' %>" href="/caller/customers">
-                    <i class="fas fa-users me-2"></i>
-                    All Customers
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= currentPage === 'create-customer' ? 'active' : '' %>"
-                    href="/caller/create-customer">
-                    <i class="fas fa-user-plus me-2"></i>
-                    Add Customer
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= currentPage === 'issues' ? 'active' : '' %>" href="/caller/issues">
-                    <i class="fas fa-tv me-2"></i>
-                    TV Issues
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= currentPage === 'profile' ? 'active' : '' %>" href="/caller/profile">
-                    <i class="fas fa-user me-2"></i>
-                    My Profile
-                </a>
-            </li>
-            <li class="nav-item mt-4">
-                <a class="nav-link" href="/caller/logout">
-                    <i class="fas fa-sign-out-alt me-2"></i>
-                    Logout
-                </a>
-            </li>
-        </ul>
+<!-- Top Navbar: Mobile Only -->
+<nav class="navbar navbar-dark bg-primary d-md-none">
+    <div class="container-fluid">
+      <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenuMobile">
+        <i class="fas fa-bars me-1"></i> Menu
+      </button>
     </div>
-</nav>
+  </nav>
+  
+  <!-- Offcanvas Sidebar: Mobile View -->
+  <div class="offcanvas offcanvas-start d-md-none bg-dark text-white" tabindex="-1" id="sidebarMenuMobile" style="width: 80vw;">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Caller Portal</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <div class="text-center mb-4 mt-3">
+        <img src="https://res.cloudinary.com/dycvkezau/image/upload/v1751786166/WhatsApp_Image_2025-07-03_at_10.39.29_245bf40b-removebg-preview_iwumxs.png"
+             alt="Company Logo"
+             style="max-width: 120px; height: auto;">
+        <h5 class="text-white mt-2">Caller Portal</h5>
+      </div>
+  
+      <ul class="nav flex-column px-3">
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'dashboard' ? 'active fw-bold' : '' %>" href="/caller/dashboard">
+            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'customers' ? 'active fw-bold' : '' %>" href="/caller/customers">
+            <i class="fas fa-users me-2"></i> All Customers
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'create-customer' ? 'active fw-bold' : '' %>" href="/caller/create-customer">
+            <i class="fas fa-user-plus me-2"></i> Add Customer
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'issues' ? 'active fw-bold' : '' %>" href="/caller/issues">
+            <i class="fas fa-tv me-2"></i> TV Issues
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'profile' ? 'active fw-bold' : '' %>" href="/caller/profile">
+            <i class="fas fa-user me-2"></i> My Profile
+          </a>
+        </li>
+        <li class="nav-item mt-4">
+          <a class="nav-link text-white" href="/caller/logout">
+            <i class="fas fa-sign-out-alt me-2"></i> Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+  <!-- Static Sidebar: Desktop View -->
+  <nav class="col-md-3 col-lg-2 d-none d-md-block bg-dark sidebar text-white">
+    <div class="position-sticky pt-3">
+      <div class="text-center mb-4">
+        <img src="https://res.cloudinary.com/dycvkezau/image/upload/v1751786166/WhatsApp_Image_2025-07-03_at_10.39.29_245bf40b-removebg-preview_iwumxs.png"
+             alt="Company Logo"
+             style="max-width: 120px; height: auto;">
+        <h5 class="text-white mt-2">Caller Portal</h5>
+      </div>
+  
+      <ul class="nav flex-column px-3">
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'dashboard' ? 'active fw-bold' : '' %>" href="/caller/dashboard">
+            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'customers' ? 'active fw-bold' : '' %>" href="/caller/customers">
+            <i class="fas fa-users me-2"></i> All Customers
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'create-customer' ? 'active fw-bold' : '' %>" href="/caller/create-customer">
+            <i class="fas fa-user-plus me-2"></i> Add Customer
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'issues' ? 'active fw-bold' : '' %>" href="/caller/issues">
+            <i class="fas fa-tv me-2"></i> TV Issues
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white <%= currentPage === 'profile' ? 'active fw-bold' : '' %>" href="/caller/profile">
+            <i class="fas fa-user me-2"></i> My Profile
+          </a>
+        </li>
+        <li class="nav-item mt-4">
+          <a class="nav-link text-white" href="/caller/logout">
+            <i class="fas fa-sign-out-alt me-2"></i> Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  

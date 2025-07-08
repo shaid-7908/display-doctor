@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
-import { ITVissue } from "../types/customer.types";
+import { ITVissue,ITVIssueStatusHistory } from "../types/customer.types";
 
 // Define interface for TV issue schema statics
 interface ITVIssueModel extends mongoose.Model<ITVissue> {
@@ -39,7 +39,7 @@ const tvIssueSchema = new Schema<ITVissue>(
     },
     issue_status: { 
       type: String, 
-      enum: ["open", "in_progress", "resolved", "closed","visit_scheduled"], 
+      enum: ["open", "in_progress", "resolved", "rejected_after_visit","visit_scheduled","closed" ,"rejected"], 
       default: "open" 
     },
     forward_status: { 
@@ -181,5 +181,64 @@ tvIssueSchema.statics.findByCode = function(code: string) {
 
 // Static method to generate issue code
 tvIssueSchema.statics.generateIssueCode = generateIssueCode;
+
+
+const statusHistorySchema = new Schema<ITVIssueStatusHistory>(
+  {
+    issue_id: {
+      type: Schema.Types.ObjectId,
+      ref: "tv_issues",
+      required: true,
+      index: true,
+    },
+    changed_by: {
+      type: Schema.Types.ObjectId,
+      ref: "callers", // or 'users' if you have multiple roles
+      required: false,
+    },
+    previous_status: {
+      type: String,
+      required: true,
+      enum: [
+        "open",
+        "in_progress",
+        "resolved",
+        "rejected_after_visit",
+        "visit_scheduled",
+        "closed",
+        "rejected",
+      ],
+    },
+    new_status: {
+      type: String,
+      required: true,
+      enum: [
+        "open",
+        "in_progress",
+        "resolved",
+        "rejected_after_visit",
+        "visit_scheduled",
+        "closed",
+        "rejected",
+      ],
+    },
+    changed_at: {
+      type: Date,
+      default: Date.now,
+    },
+    comment: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
+  },
+  { timestamps: false }
+);
+
+export const TVIssueStatusHistoryModel = model<ITVIssueStatusHistory>(
+  "tv_issue_status_histories",
+  statusHistorySchema
+);
+
 
 export const TVIssueModel = model<ITVissue, ITVIssueModel>("tv_issues", tvIssueSchema); 

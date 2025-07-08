@@ -4,13 +4,17 @@ import { CallerModel } from "../model/caller.model";
 import { CustomerModel } from "../model/customer.model";
 import { TVIssueModel } from "../model/tv-issue.model";
 import bcrypt from "bcrypt";
-import { generateAccessToken, generateRefreshToken } from "../utils/generate.token";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/generate.token";
+import { Parser } from "json2csv";
 
 class CallerController {
   // Render caller login form
   renderCallerLogin = asyncHandler(async (req: Request, res: Response) => {
     res.render("caller/login", {
-      title: "Caller Login"
+      title: "Caller Login",
     });
   });
 
@@ -20,7 +24,7 @@ class CallerController {
 
     // Find caller by email
     const caller = await CallerModel.findOne({ email });
-    console.log(caller,'caller');
+    console.log(caller, "caller");
     if (!caller) {
       req.flash("error_msg", "Invalid email or password");
       return res.redirect("/caller/login");
@@ -28,7 +32,10 @@ class CallerController {
 
     // Check if caller is active
     if (caller.status !== "active") {
-      req.flash("error_msg", "Your account has been deactivated. Please contact support.");
+      req.flash(
+        "error_msg",
+        "Your account has been deactivated. Please contact support."
+      );
       return res.redirect("/caller/login");
     }
 
@@ -54,13 +61,13 @@ class CallerController {
 
     res.cookie("callerAccessToken", accessToken, {
       httpOnly: true,
-      secure:false,
+      secure: false,
       //secure: process.env.NODE_ENV === "production",
       maxAge: 5 * 60 * 1000,
     });
-    res.cookie("callerRefreshToken", refreshToken, {  
+    res.cookie("callerRefreshToken", refreshToken, {
       httpOnly: true,
-      secure:false,
+      secure: false,
       //secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -74,7 +81,7 @@ class CallerController {
     // Clear JWT cookies
     res.clearCookie("callerAccessToken");
     res.clearCookie("callerRefreshToken");
-    
+
     req.flash("success_msg", "Logged out successfully");
     res.redirect("/caller/login");
   });
@@ -82,34 +89,36 @@ class CallerController {
   // Render caller dashboard
   renderCallerDashboard = asyncHandler(async (req: Request, res: Response) => {
     const callerId = req.caller?.id;
-    
+
     // Get caller's customers
     const customers = await CustomerModel.find({ attended_by: callerId })
       .sort({ attended_at: -1 })
       .limit(10);
 
     // Get statistics
-    const totalCustomers = await CustomerModel.countDocuments({ attended_by: callerId });
-    const activeCustomers = await CustomerModel.countDocuments({ 
-      attended_by: callerId, 
-      status: "active" 
+    const totalCustomers = await CustomerModel.countDocuments({
+      attended_by: callerId,
     });
-    const resolvedCustomers = await CustomerModel.countDocuments({ 
-      attended_by: callerId, 
-      status: "resolved" 
+    const activeCustomers = await CustomerModel.countDocuments({
+      attended_by: callerId,
+      status: "active",
     });
-    const pendingCustomers = await CustomerModel.countDocuments({ 
-      attended_by: callerId, 
-      status: "pending" 
+    const resolvedCustomers = await CustomerModel.countDocuments({
+      attended_by: callerId,
+      status: "resolved",
+    });
+    const pendingCustomers = await CustomerModel.countDocuments({
+      attended_by: callerId,
+      status: "pending",
     });
 
     // Get recent activity (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    
+
     const recentActivity = await CustomerModel.find({
       attended_by: callerId,
-      attended_at: { $gte: sevenDaysAgo }
+      attended_at: { $gte: sevenDaysAgo },
     }).sort({ attended_at: -1 });
 
     res.render("caller/dashboard", {
@@ -120,9 +129,9 @@ class CallerController {
         totalCustomers,
         activeCustomers,
         resolvedCustomers,
-        pendingCustomers
+        pendingCustomers,
       },
-      recentActivity
+      recentActivity,
     });
   });
 
@@ -138,7 +147,7 @@ class CallerController {
 
     res.render("caller/profile", {
       title: "My Profile",
-      caller
+      caller,
     });
   });
 
@@ -154,7 +163,7 @@ class CallerController {
       state,
       zipCode,
       emergencyContact,
-      emergencyName
+      emergencyName,
     } = req.body;
 
     // Handle profile image upload
@@ -172,7 +181,7 @@ class CallerController {
       state,
       zipCode,
       emergencyContact,
-      emergencyName
+      emergencyName,
     };
 
     if (profileImage) {
@@ -196,9 +205,11 @@ class CallerController {
       .sort({ attended_at: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('attended_by', 'firstName lastName');
+      .populate("attended_by", "firstName lastName");
 
-    const totalCustomers = await CustomerModel.countDocuments({ attended_by: callerId });
+    const totalCustomers = await CustomerModel.countDocuments({
+      attended_by: callerId,
+    });
     const totalPages = Math.ceil(totalCustomers / limit);
 
     res.render("caller/customers", {
@@ -210,18 +221,20 @@ class CallerController {
         totalPages,
         totalCustomers,
         hasNext: page < totalPages,
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     });
   });
 
   // Render create customer form
-  renderCreateCustomerForm = asyncHandler(async (req: Request, res: Response) => {
-    res.render("caller/create-customer", {
-      title: "Create Customer",
-      caller: req.caller,
-    });
-  });
+  renderCreateCustomerForm = asyncHandler(
+    async (req: Request, res: Response) => {
+      res.render("caller/create-customer", {
+        title: "Create Customer",
+        caller: req.caller,
+      });
+    }
+  );
 
   // Create customer
   createCustomer = asyncHandler(async (req: Request, res: Response) => {
@@ -270,7 +283,10 @@ class CallerController {
       // Create the customer with the generated code
       const customer = await CustomerModel.create(customerData);
 
-      req.flash("success_msg", `Customer "${customer.customer_name}" (${customer.customer_code}) created successfully!`);
+      req.flash(
+        "success_msg",
+        `Customer "${customer.customer_name}" (${customer.customer_code}) created successfully!`
+      );
       res.redirect("/caller/create-issue/" + customer._id);
     } catch (error) {
       console.error("Error creating customer:", error);
@@ -283,11 +299,11 @@ class CallerController {
   renderCreateIssueForm = asyncHandler(async (req: Request, res: Response) => {
     const callerId = req.caller?.id;
     const customerId = req.params.customerId;
-    
+
     // Get the specific customer
-    const customer = await CustomerModel.findOne({ 
+    const customer = await CustomerModel.findOne({
       _id: customerId,
-      attended_by: callerId 
+      attended_by: callerId,
     });
 
     if (!customer) {
@@ -299,7 +315,7 @@ class CallerController {
     res.render("caller/create-issue", {
       title: "Create TV Issue",
       caller: req.caller,
-      customer: customer
+      customer: customer,
     });
   });
 
@@ -321,21 +337,24 @@ class CallerController {
 
     // Use customer_id from form or fallback to URL parameter
     const finalCustomerId = customer_id || customerId;
-    if(issue_status === "visit_scheduled"){
-      if(!visit_date || !visit_time_range){
+    if (issue_status === "visit_scheduled") {
+      if (!visit_date || !visit_time_range) {
         req.flash("error_msg", "Visit date and time range are required");
         return res.redirect("/caller/create-issue/" + finalCustomerId);
-      }else{
-        const upadeCustomer = await CustomerModel.findByIdAndUpdate(finalCustomerId, {
-          status: "pending",
-        });
+      } else {
+        const upadeCustomer = await CustomerModel.findByIdAndUpdate(
+          finalCustomerId,
+          {
+            status: "pending",
+          }
+        );
       }
     }
     // Verify customer belongs to this caller
     const callerId = req.caller?.id;
-    const customer = await CustomerModel.findOne({ 
-      _id: finalCustomerId, 
-      attended_by: callerId 
+    const customer = await CustomerModel.findOne({
+      _id: finalCustomerId,
+      attended_by: callerId,
     });
 
     if (!customer) {
@@ -365,7 +384,10 @@ class CallerController {
       // Create the issue with the generated code
       const issue = await TVIssueModel.create(issueData);
 
-      req.flash("success_msg", `TV issue "${issue.issue_name}" (${issue.issue_code}) created successfully for ${customer.customer_name}!`);
+      req.flash(
+        "success_msg",
+        `TV issue "${issue.issue_name}" (${issue.issue_code}) created successfully for ${customer.customer_name}!`
+      );
       res.redirect("/caller/issues");
     } catch (error) {
       console.error("Error creating issue:", error);
@@ -381,36 +403,140 @@ class CallerController {
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    // Get issues for customers attended by this caller
-    const issues = await TVIssueModel.find()
-      .populate({
-        path: 'customer_id',
-        match: { attended_by: callerId },
-        select: 'customer_name customer_email customer_phone customer_city customer_state customer_code'
-      })
-      .sort({ created_at: -1 })
-      .skip(skip)
-      .limit(limit);
+    const { status, fromDate, toDate, export: exportFlag } = req.query;
 
-    // Filter out issues where customer is null (not attended by this caller)
-    const filteredIssues = issues.filter(issue => issue.customer_id);
+    const callerCustomers = await CustomerModel.find({
+      attended_by: callerId,
+    }).select("_id");
+    const customerIds = callerCustomers.map((c) => c._id);
 
-    const totalIssues = await TVIssueModel.countDocuments({
-      'customer_id': { $in: await CustomerModel.find({ attended_by: callerId }).select('_id') }
-    });
+    if (customerIds.length === 0) {
+      const paginationData = {
+        page,
+        totalPages: 0,
+        totalIssues: 0,
+        hasNext: false,
+        hasPrev: false,
+      };
+
+      if (req.xhr || exportFlag === "html") {
+        return res.render("partials/issueTable", {
+          issues: [],
+          pagination: paginationData,
+        });
+      }
+
+      return res.render("caller/issues", {
+        title: "TV Issues",
+        caller: req.caller,
+        issues: [],
+        pagination: paginationData,
+        filters: { status, fromDate, toDate },
+      });
+    }
+
+    const matchStage: any = { customer_id: { $in: customerIds } };
+
+    if (status) matchStage.issue_status = status;
+    if (fromDate || toDate) {
+      const from = fromDate ? new Date(fromDate as string) : null;
+      const to = toDate
+        ? new Date(new Date(toDate as string).setHours(23, 59, 59, 999))
+        : null;
+
+      matchStage.created_at = {};
+
+      // If only fromDate given, treat it as a single-day filter
+      if (from && !toDate) {
+        const endOfDay = new Date(from);
+        endOfDay.setHours(23, 59, 59, 999);
+        matchStage.created_at.$gte = from;
+        matchStage.created_at.$lte = endOfDay;
+      }
+
+      // If both dates are given, treat it as a range
+      if (from && toDate) {
+        matchStage.created_at.$gte = from;
+        matchStage.created_at.$lte = to;
+      }
+    }
+    
+
+    const pipeline: any[] = [
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: "customers",
+          localField: "customer_id",
+          foreignField: "_id",
+          as: "customer_info",
+        },
+      },
+      { $unwind: "$customer_info" },
+      { $sort: { created_at: -1 } },
+    ];
+
+    const countPipeline = [...pipeline, { $count: "total" }];
+    const totalAgg = await TVIssueModel.aggregate(countPipeline);
+    const totalIssues = totalAgg[0]?.total || 0;
     const totalPages = Math.ceil(totalIssues / limit);
 
+    if (!exportFlag) pipeline.push({ $skip: skip }, { $limit: limit });
+    const issues = await TVIssueModel.aggregate(pipeline);
+
+    // CSV Export
+    if (exportFlag === "csv") {
+      const { Parser } = require("json2csv");
+      const csvData = issues.map((issue) => ({
+        IssueCode: issue.issue_code,
+        IssueName: issue.issue_name,
+        Description: issue.issue_description,
+        Status: issue.issue_status,
+        CreatedAt: issue.created_at.toISOString(),
+        CustomerName: issue.customer_info?.customer_name || "",
+        CustomerCode: issue.customer_info?.customer_code || "",
+        CustomerPhone: issue.customer_info?.customer_phone || "",
+        CustomerAddress: `${issue.customer_info?.customer_city || ""}, ${
+          issue.customer_info?.customer_state || ""
+        }`,
+        TVModel: issue.tv_model || "",
+        SerialNo: issue.tv_serial_number || "",
+        Size: issue.tv_size || "",
+      }));
+
+      const parser = new Parser();
+      const csv = parser.parse(csvData);
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=tv-issues.csv"
+      );
+      return res.send(csv);
+    }
+
+    const paginationData = {
+      page,
+      totalPages,
+      totalIssues,
+      hasNext: page < totalPages,
+      hasPrev: page > 1,
+    };
+
+    // ✅ If AJAX request, return partial HTML
+    if (req.xhr || exportFlag === "html") {
+      return res.render("partials/issueTable", {
+        issues,
+        pagination: paginationData,
+      });
+    }
+
+    // Else return full page
     res.render("caller/issues", {
       title: "TV Issues",
       caller: req.caller,
-      issues: filteredIssues,
-      pagination: {
-        page,
-        totalPages,
-        totalIssues,
-        hasNext: page < totalPages,
-        hasPrev: page > 1
-      }
+      issues,
+      pagination: paginationData,
+      filters: { status, fromDate, toDate },
     });
   });
 
@@ -420,9 +546,9 @@ class CallerController {
     const customerId = req.params.customerId;
 
     // Get customer with verification that it belongs to this caller
-    const customer = await CustomerModel.findOne({ 
+    const customer = await CustomerModel.findOne({
       _id: customerId,
-      attended_by: callerId 
+      attended_by: callerId,
     });
 
     if (!customer) {
@@ -431,14 +557,21 @@ class CallerController {
     }
 
     // Get all TV issues for this customer
-    const issues = await TVIssueModel.find({ customer_id: customerId })
-      .sort({ created_at: -1 });
+    const issues = await TVIssueModel.find({ customer_id: customerId }).sort({
+      created_at: -1,
+    });
 
     // Get statistics
     const totalIssues = issues.length;
-    const openIssues = issues.filter(issue => issue.issue_status === 'open').length;
-    const resolvedIssues = issues.filter(issue => issue.issue_status === 'resolved').length;
-    const inProgressIssues = issues.filter(issue => issue.issue_status === 'in_progress').length;
+    const openIssues = issues.filter(
+      (issue) => issue.issue_status === "open"
+    ).length;
+    const resolvedIssues = issues.filter(
+      (issue) => issue.issue_status === "resolved"
+    ).length;
+    const inProgressIssues = issues.filter(
+      (issue) => issue.issue_status === "in_progress"
+    ).length;
 
     res.render("caller/customer-details", {
       title: `Customer: ${customer.customer_name}`,
@@ -449,8 +582,8 @@ class CallerController {
         totalIssues,
         openIssues,
         resolvedIssues,
-        inProgressIssues
-      }
+        inProgressIssues,
+      },
     });
   });
 
@@ -458,42 +591,52 @@ class CallerController {
   sendIssueEmail = asyncHandler(async (req: Request, res: Response) => {
     const callerId = req.caller?.id;
     const issueId = req.params.issueId;
+    console.log("here");
 
     // Get issue with customer information
-    const issue = await TVIssueModel.findById(issueId)
-      .populate('customer_id', 'customer_name customer_email customer_phone customer_address customer_city customer_state customer_zip');
+    const issue = await TVIssueModel.findById(issueId).populate(
+      "customer_id",
+      "customer_name customer_email customer_phone customer_address customer_city customer_state customer_zip"
+    );
 
     if (!issue) {
+      console.log("also here");
       req.flash("error_msg", "Issue not found");
       return res.redirect("/caller/issues");
     }
 
     // Verify the customer belongs to this caller
-    const customer = await CustomerModel.findOne({ 
+    const customer = await CustomerModel.findOne({
       _id: issue.customer_id._id,
-      attended_by: callerId 
+      attended_by: callerId,
     });
 
     if (!customer) {
-      req.flash("error_msg", "You are not authorized to send emails for this issue");
+      req.flash(
+        "error_msg",
+        "You are not authorized to send emails for this issue"
+      );
       return res.redirect("/caller/issues");
     }
 
     // Check if customer has email
-    if (!customer.customer_email) {
-      req.flash("error_msg", "Customer does not have an email address");
-      return res.redirect("/caller/issues");
-    }
+    // if (!customer.customer_email) {
+    //   req.flash("error_msg", "Customer does not have an email address");
+    //   return res.redirect("/caller/issues");
+    // }
 
     try {
+      console.log("try");
       // Prepare email content
       const emailSubject = `TV Issue Update - ${issue.issue_code}`;
-      
+
       let emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
           <div style="background: linear-gradient(135deg, #0a3d62 0%, #0d5b94 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">
             <h2 style="margin: 0; color: white;">TV Issue Update</h2>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Issue Code: ${issue.issue_code}</p>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Issue Code: ${
+              issue.issue_code
+            }</p>
           </div>
           
           <div style="background: white; padding: 20px; margin-top: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
@@ -502,7 +645,10 @@ class CallerController {
               <h4 style="color: #0a3d62; margin-top: 0;">Issue Details:</h4>
               <p><strong>Issue:</strong> ${issue.issue_name}</p>
               <p><strong>Description:</strong> ${issue.issue_description}</p>
-              <p><strong>Status:</strong> <span style="color: #0d5b94; font-weight: bold;">${issue.issue_status.charAt(0).toUpperCase() + issue.issue_status.slice(1).replace('_', ' ')}</span></p>
+              <p><strong>Status:</strong> <span style="color: #0d5b94; font-weight: bold;">${
+                issue.issue_status.charAt(0).toUpperCase() +
+                issue.issue_status.slice(1).replace("_", " ")
+              }</span></p>
             </div>
       `;
 
@@ -512,17 +658,17 @@ class CallerController {
             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
               <h4 style="color: #0a3d62; margin-top: 0;">TV Information:</h4>
         `;
-        
+
         if (issue.tv_model) {
           emailContent += `<p><strong>Model:</strong> ${issue.tv_model}</p>`;
         }
         if (issue.tv_serial_number) {
-          emailContent += `<p><strong>Serial Number:</strong> ${issue.tv_serial_number}</p>`;
+          emailContent += `<p><strong>Serial Number:</strong> </p>`;
         }
         if (issue.tv_size) {
           emailContent += `<p><strong>Size:</strong> ${issue.tv_size}"</p>`;
         }
-        
+
         emailContent += `</div>`;
       }
 
@@ -531,13 +677,15 @@ class CallerController {
         emailContent += `
             <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745;">
               <h4 style="color: #0a3d62; margin-top: 0;">📅 Visit Scheduled:</h4>
-              <p><strong>Date:</strong> ${new Date(issue.visit_date).toLocaleDateString()}</p>
+              <p><strong>Date:</strong> ${new Date(
+                issue.visit_date
+              ).toLocaleDateString()}</p>
         `;
-        
+
         if (issue.visit_time_range) {
           emailContent += `<p><strong>Time:</strong> ${issue.visit_time_range}</p>`;
         }
-        
+
         emailContent += `
               <p style="margin-top: 15px; font-size: 14px; color: #666;">
                 Please ensure technician is available at the scheduled time.
@@ -549,9 +697,16 @@ class CallerController {
       emailContent += `
             <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
               <h4 style="color: #0a3d62; margin-top: 0;">📞 Contact Information:</h4>
+              <p><strong>Customer Name:</strong>${customer.customer_name}</P>
               <p><strong>Address:</strong> ${customer.customer_address}</p>
-              <p><strong>Location:</strong> ${customer.customer_city}, ${customer.customer_state} ${customer.customer_zip}</p>
-              ${customer.customer_phone ? `<p><strong>Phone:</strong> ${customer.customer_phone}</p>` : ''}
+              <p><strong>Location:</strong> ${customer.customer_city}, ${
+        customer.customer_state
+      } ${customer.customer_zip}</p>
+              ${
+                customer.customer_phone
+                  ? `<p><strong>Phone:</strong> ${customer.customer_phone}</p>`
+                  : ""
+              }
             </div>
             
             <p>We appreciate your patience and will keep you updated on the progress of your issue.</p>
@@ -562,31 +717,113 @@ class CallerController {
           
           <div style="text-align: center; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 12px; color: #666;">
             <p>This is an automated message. Please do not reply to this email.</p>
-            <p>Issue Code: ${issue.issue_code} | Customer: ${customer.customer_code}</p>
+            <p>Issue Code: ${issue.issue_code} | Customer: ${
+        customer.customer_code
+      }</p>
           </div>
         </div>
       `;
 
       // Send email using the mail utility
-      const { sendEmail } = await import('../utils/mail.utils');
+      const { sendEmail } = await import("../utils/mail.utils");
       await sendEmail({
-        to: 'sa8701847@gmail.com',
+        to: "rahulmodanl45@gmail.com",
         subject: emailSubject,
-        html: emailContent
+        html: emailContent,
       });
 
       // Update issue forward status
       await TVIssueModel.findByIdAndUpdate(issueId, {
-        forward_status: 'sent'
+        forward_status: "sent",
       });
 
-      req.flash("success_msg", `Email sent successfully to ${customer.customer_name} (${customer.customer_email})`);
+      req.flash(
+        "success_msg",
+        `Email sent successfully to ${customer.customer_name} (${customer.customer_email})`
+      );
       res.redirect("/caller/issues");
     } catch (error) {
       console.error("Error sending email:", error);
       req.flash("error_msg", "Failed to send email. Please try again.");
       res.redirect("/caller/issues");
     }
+  });
+
+  renderEditIssue = asyncHandler(async (req, res) => {
+    const issue_id = req.params.issueid;
+    const issueDetails = await TVIssueModel.findOne({ _id: issue_id });
+
+    console.log(issueDetails);
+    if (!issueDetails) {
+      res.render("no issue found");
+    }
+    const customer = await CustomerModel.findOne({
+      _id: issueDetails?.customer_id,
+    });
+    if (!customer) {
+      res.render("no customer found");
+    }
+    res.render("caller/edit-issue", {
+      issue: issueDetails,
+      customer: customer,
+    });
+  });
+
+  editIssue = asyncHandler(async (req, res) => {
+    const issue_id = req.params.issueid;
+    const {
+      customer_id,
+      issue_name,
+      issue_status,
+      issue_description,
+      tv_model,
+      tv_serial_number,
+      tv_size,
+      issue_notes,
+      visit_date,
+      visit_time_range,
+    } = req.body;
+
+    const updatedData = {
+      customer_id,
+      issue_name,
+      issue_status,
+      issue_description,
+      tv_model,
+      tv_serial_number,
+      tv_size,
+      issue_notes,
+      visit_date: visit_date ? new Date(visit_date) : null,
+      visit_time_range,
+    };
+    const updatedIssue = await TVIssueModel.findByIdAndUpdate(
+      issue_id,
+      updatedData,
+      { new: true }
+    );
+
+    if (!updatedIssue) {
+      req.flash("error", "Issue not found.");
+      return res.redirect("/caller/issues");
+    }
+    req.flash("success", "Issue updated successfully.");
+    res.redirect(`/caller/issue-details/${issue_id}`);
+  });
+
+  renderIssueDetails = asyncHandler(async (req, res) => {
+    const issue_id = req.params.issueid;
+    const issueDetails = await TVIssueModel.findOne({ _id: issue_id });
+    if (!issueDetails) {
+      req.flash("error", "Issue not found");
+      res.redirect("/caller/issues");
+    }
+    const customer = await CustomerModel.findOne({
+      _id: issueDetails?.customer_id,
+    });
+    res.render("caller/issue-details", {
+      issue: issueDetails,
+      customer: customer,
+    });
   });
 }
 

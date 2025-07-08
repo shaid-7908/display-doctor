@@ -29,3 +29,13 @@ export interface ITVissue extends Document {
     visit_time_range: string;
     forward_status: string;
 }
+
+export interface ITVIssueStatusHistory {
+  issue_id: Types.ObjectId; // Reference to TV issue
+  changed_by?: Types.ObjectId; // Caller or Admin who made the change
+  previous_status: string;
+  new_status: string;
+  changed_at?: Date;
+  comment?: string; // Optional reason or notes
+}
+  

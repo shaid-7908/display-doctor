@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Issue Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="/css/caller.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <%- include('./layout/sidebar', { currentPage: 'issue-details' }) %>
+
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+        <!-- Back button -->
+        <div class="mb-4">
+          <a href="/caller/issues" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to All Issues
+          </a>
+        </div>
+
+        <!-- Issue Header -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-tv me-2"></i>Issue: <%= issue.issue_name %></h5>
+            <span class="badge bg-<%= issue.issue_status === 'open' ? 'warning' :
+                                     issue.issue_status === 'in_progress' ? 'info' :
+                                     issue.issue_status === 'resolved' ? 'success' :
+                                     issue.issue_status === 'closed' ? 'secondary' : 'primary' %> fs-6">
+              <%= issue.issue_status.replace('_', ' ').toUpperCase() %>
+            </span>
+          </div>
+          <div class="card-body">
+            <p><strong>Description:</strong> <%= issue.issue_description %></p>
+            <% if (issue.issue_notes) { %>
+              <p><strong>Notes:</strong> <%= issue.issue_notes %></p>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="row g-4">
+          <!-- TV Info -->
+          <div class="col-md-6">
+            <div class="card shadow-sm">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-tv me-2"></i>TV Information</h6>
+              </div>
+              <div class="card-body">
+                <p><strong>Model:</strong> <%= issue.tv_model || 'N/A' %></p>
+                <p><strong>Serial Number:</strong> <%= issue.tv_serial_number || 'N/A' %></p>
+                <p><strong>Size:</strong> <%= issue.tv_size || 'N/A' %></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visit Info -->
+          <div class="col-md-6">
+            <div class="card shadow-sm">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Visit Scheduling</h6>
+              </div>
+              <div class="card-body">
+                <% if (issue.visit_date) { %>
+                  <p><strong>Date:</strong> <%= new Date(issue.visit_date).toDateString() %></p>
+                  <p><strong>Time Slot:</strong> <%= issue.visit_time_range || 'N/A' %></p>
+                <% } else { %>
+                  <p class="text-muted">No visit scheduled.</p>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="card shadow-sm mt-4">
+          <div class="card-header bg-light">
+            <h6 class="mb-0"><i class="fas fa-user me-2"></i>Customer Information</h6>
+          </div>
+          <div class="card-body">
+            <p><strong>Name:</strong> <%= customer.customer_name %></p>
+            <% if (customer.customer_email) { %>
+              <p><strong>Email:</strong> <%= customer.customer_email %></p>
+            <% } %>
+            <% if (customer.customer_phone) { %>
+              <p><strong>Phone:</strong> <%= customer.customer_phone %></p>
+            <% } %>
+            <% if (customer.customer_address || customer.customer_city || customer.customer_state || customer.customer_zip) { %>
+              <p>
+                <strong>Address:</strong>
+                <%= customer.customer_address || '' %>,
+                <%= customer.customer_city || '' %>,
+                <%= customer.customer_state || '' %>
+                <%= customer.customer_zip ? `- ${customer.customer_zip}` : '' %>
+              </p>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="mt-4 d-flex justify-content-end">
+          <a href="/caller/edit-issue/<%= issue._id %>" class="btn btn-warning">
+            <i class="fas fa-edit me-1"></i>Edit Issue
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
