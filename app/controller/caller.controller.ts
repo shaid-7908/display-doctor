@@ -54,12 +54,14 @@ class CallerController {
 
     res.cookie("callerAccessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure:false,
+      //secure: process.env.NODE_ENV === "production",
       maxAge: 5 * 60 * 1000,
     });
     res.cookie("callerRefreshToken", refreshToken, {  
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure:false,
+      //secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 

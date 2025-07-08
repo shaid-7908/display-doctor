@@ -62,7 +62,8 @@ export const authenticateCaller = asyncHandler(async (req: Request, res: Respons
       // Set new access token in cookie
       res.cookie("callerAccessToken", newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure:false,
+        //secure: process.env.NODE_ENV === "production",
         maxAge: 5 * 60 * 1000, // 5 minutes
       });
     }
