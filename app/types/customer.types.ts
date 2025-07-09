@@ -37,5 +37,7 @@ export interface ITVIssueStatusHistory {
   new_status: string;
   changed_at?: Date;
   comment?: string; // Optional reason or notes
+  prev_visit_date:string;
+  current_visit_date:string;
 }
   

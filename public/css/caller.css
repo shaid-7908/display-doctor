@@ -217,4 +217,9 @@
 .offcanvas-start {
     background: linear-gradient(to bottom, #003366, #004080);
   }
+
+  .bg-orange {
+    background-color: #fd7e14; /* Bootstrap's orange */
+    color: white;
+  }
   

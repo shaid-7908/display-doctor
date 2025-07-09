@@ -55,13 +55,14 @@
               statusClass = "bg-danger"; break; case "visit_scheduled":
               statusClass = "bg-info"; break; case "closed": statusClass =
               "bg-secondary"; break; case "rejected": statusClass = "bg-dark";
+              case "visit_rescheduled": statusClass ="bg-orange";
               break; default: statusClass = "bg-light text-dark"; break; } %>
               <span class="badge <%= statusClass %>">
                 <%= issue.issue_status.replace(/_/g, ' ') %>
               </span>
             </td>
             <td><%= new Date(issue.created_at).toLocaleDateString() %></td>
-            <td class="d-flex flex-wrap gap-1">
+            <td class=" gap-1">
                 <a
                   href="/caller/issue-details/<%= issue._id %>"
                   class="btn btn-sm btn-outline-primary"
@@ -73,11 +74,19 @@
                   class="btn btn-sm btn-warning update-status-btn"
                   data-issue-id="<%= issue._id %>"
                   data-current-status="<%= issue.issue_status %>"
+                  data-visit-date="<%= issue.visit_date %>"
+                  data-visit-time-range = "<%= issue.visit_time_range %>"
                   data-bs-toggle="modal"
                   data-bs-target="#updateStatusModal"
                 >
                   Update Status
                 </button>
+                <a
+    href="/caller/issue-history/<%= issue._id %>"
+    class="btn btn-sm btn-secondary mt-1"
+  >
+    <i class="fas fa-history me-1"></i>History
+  </a>
               </td>
               
           </tr>
@@ -92,7 +101,7 @@
 <!-- Update Status Modal -->
 <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <form id="statusUpdateForm" method="POST" action="/caller/update-status">
+      <form id="statusUpdateForm" method="POST" action="/caller/update-issue-status">
         <input type="hidden" name="issue_id" id="modalIssueId" />
   
         <div class="modal-content">
@@ -114,12 +123,66 @@
                 <option value="rejected_after_visit">Rejected After Visit</option>
                 <option value="closed">Closed</option>
                 <option value="rejected">Rejected</option>
+                <option value="visit_rescheduled">Visit Rescheduled</option>
               </select>
             </div>
             <div class="mb-3">
               <label for="statusComment" class="form-label">Comment (optional)</label>
               <textarea class="form-control" name="comment" id="statusComment" rows="3"></textarea>
             </div>
+            <div id="visitSchedulingSection" class="row d-none">
+              <div class="col-12 mb-3">
+                <div class="card border-primary">
+                  <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                      <i class="fas fa-calendar-alt me-2"></i>Visit Scheduling (Optional)
+                    </h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label for="visit_date" class="form-label">
+                          <i class="fas fa-calendar me-2"></i>Visit Date
+                        </label>
+                        <input
+                          type="date"
+                          class="form-control form-control-lg"
+                          id="visit_date"
+                          name="visit_date"
+                          min="<%= new Date().toISOString().split('T')[0] %>"
+                        />
+                        <small class="text-muted">Select a date for the visit (optional)</small>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="visit_time_range" class="form-label">
+                          <i class="fas fa-clock me-2"></i>Visit Time Range
+                        </label>
+                        <select
+                          class="form-select form-select-lg"
+                          id="visit_time_range"
+                          name="visit_time_range"
+                        >
+                          <option value="">Select time range (optional)</option>
+                          <option value="8:00 AM - 10:00 AM">8:00 AM - 10:00 AM</option>
+                          <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
+                          <option value="12:00 PM - 2:00 PM">12:00 PM - 2:00 PM</option>
+                          <option value="2:00 PM - 4:00 PM">2:00 PM - 4:00 PM</option>
+                          <option value="4:00 PM - 6:00 PM">4:00 PM - 6:00 PM</option>
+                          <option value="6:00 PM - 8:00 PM">6:00 PM - 8:00 PM</option>
+                        </select>
+                        <small class="text-muted">Choose a 2-hour time slot</small>
+                      </div>
+                    </div>
+                    <div class="alert alert-info mb-0">
+                      <i class="fas fa-info-circle me-2"></i>
+                      <strong>Note:</strong> Visit scheduling is optional.
+                      You can schedule a visit later or leave these fields empty.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-primary">
@@ -146,16 +209,48 @@
 <% } %>
 
 <script>
-    $(document).on('click', '.update-status-btn', function () {
-    console.log('hola')
+  function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = (`0${date.getMonth() + 1}`).slice(-2);
+    const day = (`0${date.getDate()}`).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+
+  function toggleVisitSchedulingSection() {
+  const selectedStatus = $('#newStatus').val();
+  if (selectedStatus === 'visit_scheduled' || selectedStatus === 'visit_rescheduled') {
+    $('#visitSchedulingSection').removeClass('d-none');
+  } else {
+    $('#visitSchedulingSection').addClass('d-none');
+    $('#visit_date').val('');
+    $('#visit_time_range').val('');
+  }
+}
+
+
+  $(document).on('click', '.update-status-btn', function () {
     const issueId = $(this).data('issue-id');
     const currentStatus = $(this).data('current-status');
+    const currentVisitDate = $(this).data('visit-date');
+    const currentVisitTimeRange = $(this).data('visit-time-range');
 
     $('#modalIssueId').val(issueId);
     $('#newStatus').val(currentStatus);
     $('#statusComment').val('');
+
+    $('#visit_date').val(formatDate(currentVisitDate));
+    $('#visit_time_range').val(currentVisitTimeRange || '');
+
+    toggleVisitSchedulingSection();
   });
+
+  $('#newStatus').on('change', toggleVisitSchedulingSection);
 </script>
+
+
+
 <!-- jQuery (before Bootstrap) -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 

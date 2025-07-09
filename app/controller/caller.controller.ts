@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/async.hadler";
 import { Request, Response } from "express";
 import { CallerModel } from "../model/caller.model";
 import { CustomerModel } from "../model/customer.model";
-import { TVIssueModel } from "../model/tv-issue.model";
+import { TVIssueModel, TVIssueStatusHistoryModel } from "../model/tv-issue.model";
 import bcrypt from "bcrypt";
 import {
   generateAccessToken,
@@ -815,7 +815,7 @@ class CallerController {
     const issueDetails = await TVIssueModel.findOne({ _id: issue_id });
     if (!issueDetails) {
       req.flash("error", "Issue not found");
-      res.redirect("/caller/issues");
+      res.redirect("/caller/dashboard");
     }
     const customer = await CustomerModel.findOne({
       _id: issueDetails?.customer_id,
@@ -825,6 +825,42 @@ class CallerController {
       customer: customer,
     });
   });
+  upadteIssueStatus = asyncHandler(async (req,res)=>{
+    console.log(req.body)
+     const {issue_id,new_status,comment,visit_date,visit_time_range}= req.body
+     const caller_id = req.caller?.id
+     const issueFound = await TVIssueModel.findOne({_id:issue_id})
+     if(!issueFound){
+      req.flash('error_msg','Issue not found')
+      res.redirect('/caller/issues')
+     }
+     const prevStatusValue = issueFound?.issue_status
+     const prev_visit_date = issueFound?.visit_date 
+     const current_visit_date = visit_date ? new Date(visit_date) : prev_visit_date
+     const udateIssueSTatus = await TVIssueModel.findByIdAndUpdate(
+       issue_id,
+       {
+         issue_status: new_status,
+         visit_date: current_visit_date,
+         visit_time_range: visit_time_range || undefined,
+       },
+       { new: true }
+     );
+     console.log(udateIssueSTatus)
+     const issueHistory = await TVIssueStatusHistoryModel.create({
+      issue_id:issue_id,
+      changed_by:caller_id,
+      previous_status:prevStatusValue,
+      new_status:new_status,
+      comment:comment,
+      changed_at:new Date(),
+      prev_visit_date:prev_visit_date,
+      current_visit_date:current_visit_date
+     })
+     req.flash("success_msg",`Issue status changed for Issue code :${issueFound?.issue_code}`)
+     res.redirect('/caller/issues')
+
+  })
 }
 
 export default new CallerController();

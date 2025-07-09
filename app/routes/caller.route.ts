@@ -88,5 +88,5 @@ router.get(
   authenticateCaller,
   callerController.renderIssueDetails
 );
-
+router.post("/update-issue-status",authenticateCaller,callerController.upadteIssueStatus);
 export default router;
