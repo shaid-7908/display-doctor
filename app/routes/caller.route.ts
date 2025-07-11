@@ -89,4 +89,5 @@ router.get(
   callerController.renderIssueDetails
 );
 router.post("/update-issue-status",authenticateCaller,callerController.upadteIssueStatus);
+router.get("/issue-history/:issueId", authenticateCaller, callerController.getIssueHistory);
 export default router;

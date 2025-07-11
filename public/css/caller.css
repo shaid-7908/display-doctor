@@ -2,6 +2,32 @@
 .sidebar {
     min-height: 100vh;
     background: linear-gradient(135deg, #0a3d62 0%, #0d5b94 100%);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar .position-sticky {
+    position: sticky !important;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Ensure proper sticky behavior */
+@media (min-width: 768px) {
+    .sidebar {
+        position: sticky !important;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    .col-md-9.ms-sm-auto.col-lg-10 {
+        min-height: 100vh;
+    }
 }
 
 .sidebar .nav-link {
@@ -216,10 +242,10 @@
 /* Optional: smooth offcanvas with dark theme */
 .offcanvas-start {
     background: linear-gradient(to bottom, #003366, #004080);
-  }
+}
 
-  .bg-orange {
-    background-color: #fd7e14; /* Bootstrap's orange */
+.bg-orange {
+    background-color: #fd7e14;
+    /* Bootstrap's orange */
     color: white;
-  }
-  
+}

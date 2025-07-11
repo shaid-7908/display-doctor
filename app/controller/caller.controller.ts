@@ -861,6 +861,36 @@ class CallerController {
      res.redirect('/caller/issues')
 
   })
+
+  getIssueHistory = asyncHandler(async (req: Request, res: Response) => {
+    const issueId = req.params.issueId;
+    
+    try {
+      // Get the issue details
+      const issue = await TVIssueModel.findById(issueId);
+      if (!issue) {
+        return res.status(404).json({ error: "Issue not found" });
+      }
+
+      // Get the status history for this issue
+      const history = await TVIssueStatusHistoryModel.find({ issue_id: issueId })
+        .populate('changed_by', 'firstName lastName email')
+        .sort({ changed_at: -1 });
+
+      // Return the data as JSON for AJAX request
+      res.json({
+        issue: {
+          issue_code: issue.issue_code,
+          issue_name: issue.issue_name,
+          current_status: issue.issue_status
+        },
+        history: history
+      });
+    } catch (error) {
+      console.error("Error fetching issue history:", error);
+      res.status(500).json({ error: "Failed to fetch issue history" });
+    }
+  });
 }
 
 export default new CallerController();

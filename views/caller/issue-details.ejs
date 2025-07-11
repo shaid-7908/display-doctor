@@ -1,12 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <title>Issue Details</title>
+  <title>Issue Details - <%= issue.issue_code %>
+  </title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
   <link href="/css/caller.css" rel="stylesheet" />
+  <style>
+    .issue-header {
+      background: linear-gradient(135deg, #0a3d62 0%, #0d5b94 100%);
+      color: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-badge-large {
+      font-size: 1rem;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .info-card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+
+    .info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .info-card .card-header {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-bottom: 3px solid #0d5b94;
+      border-radius: 15px 15px 0 0 !important;
+      font-weight: 600;
+      color: #0a3d62;
+    }
+
+    .history-timeline {
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .history-timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, #0d5b94, #0a3d62);
+    }
+
+    .history-item {
+      position: relative;
+      margin-bottom: 25px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #0d5b94;
+    }
+
+    .history-item::before {
+      content: '';
+      position: absolute;
+      left: -23px;
+      top: 25px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #0d5b94;
+      border: 3px solid white;
+      box-shadow: 0 0 0 3px #0d5b94;
+    }
+
+    .history-item:first-child {
+      border-left-color: #28a745;
+    }
+
+    .history-item:first-child::before {
+      background: #28a745;
+      box-shadow: 0 0 0 3px #28a745;
+    }
+
+    .history-status {
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-weight: 600;
+    }
+
+    .action-buttons {
+      position: sticky;
+      top: 20px;
+      z-index: 100;
+    }
+
+    .customer-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0a3d62 0%, #0d5b94 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .issue-code-display {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: #0a3d62;
+    }
+
+    .detail-value {
+      color: #333;
+    }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .no-history {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6c757d;
+    }
+
+    .no-history i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+  </style>
 </head>
 
 <body>
@@ -14,102 +175,527 @@
     <div class="row">
       <%- include('./layout/sidebar', { currentPage: 'issue-details' }) %>
 
-      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-        <!-- Back button -->
-        <div class="mb-4">
-          <a href="/caller/issues" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Back to All Issues
-          </a>
-        </div>
-
-        <!-- Issue Header -->
-        <div class="card shadow-sm mb-4">
-          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-tv me-2"></i>Issue: <%= issue.issue_name %></h5>
-            <span class="badge bg-<%= issue.issue_status === 'open' ? 'warning' :
-                                     issue.issue_status === 'in_progress' ? 'info' :
-                                     issue.issue_status === 'resolved' ? 'success' :
-                                     issue.issue_status === 'closed' ? 'secondary' : 'primary' %> fs-6">
-              <%= issue.issue_status.replace('_', ' ').toUpperCase() %>
-            </span>
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4" style="min-height: 100vh;">
+          <!-- Back button -->
+          <div class="mb-4">
+            <a href="/caller/issues" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left me-2"></i>Back to All Issues
+            </a>
           </div>
-          <div class="card-body">
-            <p><strong>Description:</strong> <%= issue.issue_description %></p>
-            <% if (issue.issue_notes) { %>
-              <p><strong>Notes:</strong> <%= issue.issue_notes %></p>
-            <% } %>
-          </div>
-        </div>
 
-        <!-- Info Cards -->
-        <div class="row g-4">
-          <!-- TV Info -->
-          <div class="col-md-6">
-            <div class="card shadow-sm">
-              <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="fas fa-tv me-2"></i>TV Information</h6>
+          <!-- Issue Header -->
+          <div class="issue-header">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="issue-code-display me-3">
+                    <%= issue.issue_code %>
+                  </div>
+                  <span class="status-badge-large bg-<%= 
+                  issue.issue_status === 'open' ? 'warning' :
+                  issue.issue_status === 'in_progress' ? 'info' :
+                  issue.issue_status === 'resolved' ? 'success' :
+                  issue.issue_status === 'closed' ? 'secondary' :
+                  issue.issue_status === 'rejected_after_visit' ? 'danger' :
+                  issue.issue_status === 'visit_scheduled' ? 'primary' :
+                  issue.issue_status === 'visit_rescheduled' ? 'orange' :
+                  issue.issue_status === 'rejected' ? 'dark' : 'primary' 
+                %>">
+                    <%= issue.issue_status.replace(/_/g, ' ' ).toUpperCase() %>
+                  </span>
+                </div>
+                <h2 class="mb-2">
+                  <%= issue.issue_name %>
+                </h2>
+                <p class="mb-0 opacity-75">
+                  <%= issue.issue_description %>
+                </p>
               </div>
-              <div class="card-body">
-                <p><strong>Model:</strong> <%= issue.tv_model || 'N/A' %></p>
-                <p><strong>Serial Number:</strong> <%= issue.tv_serial_number || 'N/A' %></p>
-                <p><strong>Size:</strong> <%= issue.tv_size || 'N/A' %></p>
+              <div class="col-md-4 text-md-end">
+                <div class="d-flex flex-column align-items-md-end">
+                  <small class="text-white-50 mb-2">Created on</small>
+                  <strong>
+                    <%= new Date(issue.created_at).toLocaleDateString() %>
+                  </strong>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Visit Info -->
-          <div class="col-md-6">
-            <div class="card shadow-sm">
-              <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Visit Scheduling</h6>
+          <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+              <!-- Issue Information Cards -->
+              <div class="row g-4 mb-4">
+                <!-- TV Information -->
+                <div class="col-md-6">
+                  <div class="card info-card">
+                    <div class="card-header">
+                      <h6 class="mb-0"><i class="fas fa-tv me-2"></i>TV Information</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="detail-row">
+                        <span class="detail-label">Model:</span>
+                        <span class="detail-value">
+                          <%= issue.tv_model || 'N/A' %>
+                        </span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="detail-label">Serial Number:</span>
+                        <span class="detail-value">
+                          <%= issue.tv_serial_number || 'N/A' %>
+                        </span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="detail-label">Size:</span>
+                        <span class="detail-value">
+                          <%= issue.tv_size || 'N/A' %>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Visit Information -->
+                <div class="col-md-6">
+                  <div class="card info-card">
+                    <div class="card-header">
+                      <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Visit Scheduling</h6>
+                    </div>
+                    <div class="card-body">
+                      <% if (issue.visit_date) { %>
+                        <div class="detail-row">
+                          <span class="detail-label">Date:</span>
+                          <span class="detail-value">
+                            <%= new Date(issue.visit_date).toLocaleDateString() %>
+                          </span>
+                        </div>
+                        <div class="detail-row">
+                          <span class="detail-label">Time Slot:</span>
+                          <span class="detail-value">
+                            <%= issue.visit_time_range || 'N/A' %>
+                          </span>
+                        </div>
+                        <% } else { %>
+                          <div class="text-center text-muted py-3">
+                            <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                            <p class="mb-0">No visit scheduled</p>
+                          </div>
+                          <% } %>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="card-body">
-                <% if (issue.visit_date) { %>
-                  <p><strong>Date:</strong> <%= new Date(issue.visit_date).toDateString() %></p>
-                  <p><strong>Time Slot:</strong> <%= issue.visit_time_range || 'N/A' %></p>
-                <% } else { %>
-                  <p class="text-muted">No visit scheduled.</p>
+
+              <!-- Customer Information -->
+              <div class="card info-card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0"><i class="fas fa-user me-2"></i>Customer Information</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row align-items-center mb-3">
+                    <div class="col-auto">
+                      <div class="customer-avatar">
+                        <%= customer.customer_name.charAt(0).toUpperCase() %>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <h5 class="mb-1">
+                        <%= customer.customer_name %>
+                      </h5>
+                      <p class="text-muted mb-0">Customer Code: <%= customer.customer_code %>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <% if (customer.customer_email) { %>
+                        <div class="detail-row">
+                          <span class="detail-label">Email:</span>
+                          <span class="detail-value">
+                            <%= customer.customer_email %>
+                          </span>
+                        </div>
+                        <% } %>
+                          <% if (customer.customer_phone) { %>
+                            <div class="detail-row">
+                              <span class="detail-label">Phone:</span>
+                              <span class="detail-value">
+                                <%= customer.customer_phone %>
+                              </span>
+                            </div>
+                            <% } %>
+                    </div>
+                    <div class="col-md-6">
+                      <% if (customer.customer_address || customer.customer_city || customer.customer_state ||
+                        customer.customer_zip) { %>
+                        <div class="detail-row">
+                          <span class="detail-label">Address:</span>
+                          <span class="detail-value">
+                            <%= customer.customer_address || '' %>
+                              <% if (customer.customer_city || customer.customer_state) { %>
+                                <br>
+                                <%= customer.customer_city || '' %>, <%= customer.customer_state || '' %>
+                                    <% } %>
+                                      <% if (customer.customer_zip) { %>
+                                        <br>
+                                        <%= customer.customer_zip %>
+                                          <% } %>
+                          </span>
+                        </div>
+                        <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Issue Notes -->
+              <% if (issue.issue_notes) { %>
+                <div class="card info-card mb-4">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Additional Notes</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="mb-0">
+                      <%= issue.issue_notes %>
+                    </p>
+                  </div>
+                </div>
                 <% } %>
+
+                  <!-- Issue History -->
+                  <div class="card info-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                      <h6 class="mb-0"><i class="fas fa-history me-2"></i>Status History</h6>
+                      <button class="btn btn-sm btn-outline-primary" onclick="refreshHistory()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                      </button>
+                    </div>
+                    <div class="card-body">
+                      <div id="historyLoading" class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                      <div id="historyContent" class="d-none">
+                        <div class="history-timeline" id="historyList">
+                          <!-- History items will be loaded here -->
+                        </div>
+                      </div>
+                      <div id="historyError" class="d-none">
+                        <div class="alert alert-danger">
+                          <i class="fas fa-exclamation-triangle me-2"></i>
+                          <span id="errorMessage">Failed to load history</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+
+            <!-- Sidebar Actions -->
+            <div class="col-lg-4">
+              <div class="action-buttons">
+                <div class="card info-card mb-4">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-cogs me-2"></i>Quick Actions</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-grid gap-3">
+                      <a href="/caller/edit-issue/<%= issue._id %>" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Edit Issue
+                      </a>
+                      <button class="btn btn-info" onclick="openUpdateStatusModal()">
+                        <i class="fas fa-sync-alt me-2"></i>Update Status
+                      </button>
+                      <a href="/caller/send-mail/<%= issue._id %>" class="btn btn-success">
+                        <i class="fas fa-envelope me-2"></i>Send Email
+                      </a>
+                      <a href="/caller/issues" class="btn btn-outline-secondary">
+                        <i class="fas fa-list me-2"></i>View All Issues
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Issue Statistics -->
+                <div class="card info-card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Issue Statistics</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="row text-center">
+                      <div class="col-6">
+                        <div class="border-end">
+                          <h4 class="text-primary mb-1" id="historyCount">-</h4>
+                          <small class="text-muted">Status Changes</small>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <h4 class="text-info mb-1">
+                          <%= Math.floor((new Date() - new Date(issue.created_at)) / (1000 * 60 * 60 * 24)) %>
+                        </h4>
+                        <small class="text-muted">Days Active</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Customer Info -->
-        <div class="card shadow-sm mt-4">
-          <div class="card-header bg-light">
-            <h6 class="mb-0"><i class="fas fa-user me-2"></i>Customer Information</h6>
-          </div>
-          <div class="card-body">
-            <p><strong>Name:</strong> <%= customer.customer_name %></p>
-            <% if (customer.customer_email) { %>
-              <p><strong>Email:</strong> <%= customer.customer_email %></p>
-            <% } %>
-            <% if (customer.customer_phone) { %>
-              <p><strong>Phone:</strong> <%= customer.customer_phone %></p>
-            <% } %>
-            <% if (customer.customer_address || customer.customer_city || customer.customer_state || customer.customer_zip) { %>
-              <p>
-                <strong>Address:</strong>
-                <%= customer.customer_address || '' %>,
-                <%= customer.customer_city || '' %>,
-                <%= customer.customer_state || '' %>
-                <%= customer.customer_zip ? `- ${customer.customer_zip}` : '' %>
-              </p>
-            <% } %>
-          </div>
-        </div>
-
-        <!-- Action Button -->
-        <div class="mt-4 d-flex justify-content-end">
-          <a href="/caller/edit-issue/<%= issue._id %>" class="btn btn-warning">
-            <i class="fas fa-edit me-1"></i>Edit Issue
-          </a>
-        </div>
-      </main>
+        </main>
     </div>
   </div>
 
+  <!-- Update Status Modal -->
+  <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="statusUpdateForm" method="POST" action="/caller/update-issue-status">
+        <input type="hidden" name="issue_id" value="<%= issue._id %>" />
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateStatusModalLabel">
+              <i class="fas fa-sync-alt me-2"></i>Update Issue Status
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="newStatus" class="form-label">New Status</label>
+              <select class="form-select" name="new_status" id="newStatus" required>
+                <option value="">-- Select Status --</option>
+                <option value="open" <%=issue.issue_status==='open' ? 'selected' : '' %>>Open</option>
+                <option value="in_progress" <%=issue.issue_status==='in_progress' ? 'selected' : '' %>>In Progress
+                </option>
+                <option value="visit_scheduled" <%=issue.issue_status==='visit_scheduled' ? 'selected' : '' %>>Visit
+                  Scheduled</option>
+                <option value="resolved" <%=issue.issue_status==='resolved' ? 'selected' : '' %>>Resolved</option>
+                <option value="rejected_after_visit" <%=issue.issue_status==='rejected_after_visit' ? 'selected' : '' %>
+                  >Rejected After Visit</option>
+                <option value="closed" <%=issue.issue_status==='closed' ? 'selected' : '' %>>Closed</option>
+                <option value="rejected" <%=issue.issue_status==='rejected' ? 'selected' : '' %>>Rejected</option>
+                <option value="visit_rescheduled" <%=issue.issue_status==='visit_rescheduled' ? 'selected' : '' %>>Visit
+                  Rescheduled</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="statusComment" class="form-label">Comment (optional)</label>
+              <textarea class="form-control" name="comment" id="statusComment" rows="3"
+                placeholder="Add a comment about this status change..."></textarea>
+            </div>
+            <div id="visitSchedulingSection" class="row d-none">
+              <div class="col-12 mb-3">
+                <div class="card border-primary">
+                  <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                      <i class="fas fa-calendar-alt me-2"></i>Visit Scheduling (Optional)
+                    </h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label for="visit_date" class="form-label">
+                          <i class="fas fa-calendar me-2"></i>Visit Date
+                        </label>
+                        <input type="date" class="form-control" id="visit_date" name="visit_date"
+                          min="<%= new Date().toISOString().split('T')[0] %>" />
+                        <small class="text-muted">Select a date for the visit (optional)</small>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="visit_time_range" class="form-label">
+                          <i class="fas fa-clock me-2"></i>Visit Time Range
+                        </label>
+                        <select class="form-select" id="visit_time_range" name="visit_time_range">
+                          <option value="">Select time range (optional)</option>
+                          <option value="8:00 AM - 10:00 AM">8:00 AM - 10:00 AM</option>
+                          <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
+                          <option value="12:00 PM - 2:00 PM">12:00 PM - 2:00 PM</option>
+                          <option value="2:00 PM - 4:00 PM">2:00 PM - 4:00 PM</option>
+                          <option value="4:00 PM - 6:00 PM">4:00 PM - 6:00 PM</option>
+                          <option value="6:00 PM - 8:00 PM">6:00 PM - 8:00 PM</option>
+                        </select>
+                        <small class="text-muted">Choose a 2-hour time slot</small>
+                      </div>
+                    </div>
+                    <div class="alert alert-info mb-0">
+                      <i class="fas fa-info-circle me-2"></i>
+                      <strong>Note:</strong> Visit scheduling is optional.
+                      You can schedule a visit later or leave these fields empty.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-1"></i>Save Changes
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Load history when page loads
+    $(document).ready(function () {
+      loadIssueHistory('<%= issue._id %>');
+      
+      // Ensure sidebar sticky behavior
+      $(window).on('scroll', function() {
+        const sidebar = $('.sidebar');
+        if (sidebar.length && window.innerWidth >= 768) {
+          sidebar.css('position', 'sticky');
+          sidebar.css('top', '0');
+        }
+      });
+    });
+
+    function loadIssueHistory(issueId) {
+      // Show loading state
+      $('#historyLoading').removeClass('d-none');
+      $('#historyContent').addClass('d-none');
+      $('#historyError').addClass('d-none');
+
+      // Fetch history data
+      $.ajax({
+        url: `/caller/issue-history/${issueId}`,
+        method: 'GET',
+        success: function (data) {
+          $('#historyLoading').addClass('d-none');
+          $('#historyContent').removeClass('d-none');
+
+          // Update history count
+          $('#historyCount').text(data.history.length);
+
+          // Build history list
+          const historyList = $('#historyList');
+          historyList.empty();
+
+          if (data.history.length === 0) {
+            historyList.html(`
+              <div class="no-history">
+                <i class="fas fa-info-circle"></i>
+                <h6>No Status History</h6>
+                <p>This issue hasn't had any status changes yet.</p>
+              </div>
+            `);
+          } else {
+            data.history.forEach((item, index) => {
+              const statusClass = getStatusClass(item.new_status);
+              const changedBy = item.changed_by ? `${item.changed_by.firstName} ${item.changed_by.lastName}` : 'System';
+              const changedAt = new Date(item.changed_at).toLocaleString();
+
+              const historyItem = `
+                <div class="history-item">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="history-status badge ${statusClass}">${item.new_status.replace(/_/g, ' ')}</span>
+                    <small class="text-muted">${changedAt}</small>
+                  </div>
+                  ${item.comment ? `<p class="mb-2"><strong>Comment:</strong> ${item.comment}</p>` : ''}
+                  <div class="row">
+                    <div class="col-md-6">
+                      <small class="text-muted">Previous Status:</small><br>
+                      <span class="badge bg-light text-dark">${item.previous_status.replace(/_/g, ' ')}</span>
+                    </div>
+                    <div class="col-md-6">
+                      <small class="text-muted">Changed By:</small><br>
+                      <span class="fw-bold">${changedBy}</span>
+                    </div>
+                  </div>
+                  ${item.prev_visit_date !== 'NA' || item.current_visit_date !== 'NA' ? `
+                    <div class="mt-2 p-2 bg-light rounded">
+                      <small class="text-muted d-block mb-1">Visit Date Changes:</small>
+                      <div class="row">
+                        <div class="col-6">
+                          <small class="text-muted">From:</small><br>
+                          <span class="text-muted">${item.prev_visit_date === 'NA' ? 'Not set' : new Date(item.prev_visit_date).toLocaleDateString()}</span>
+                        </div>
+                        <div class="col-6">
+                          <small class="text-muted">To:</small><br>
+                          <span class="text-muted">${item.current_visit_date === 'NA' ? 'Not set' : new Date(item.current_visit_date).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+              historyList.append(historyItem);
+            });
+          }
+        },
+        error: function (xhr, status, error) {
+          $('#historyLoading').addClass('d-none');
+          $('#historyError').removeClass('d-none');
+          $('#errorMessage').text(xhr.responseJSON?.error || 'Failed to load history');
+        }
+      });
+    }
+
+    function refreshHistory() {
+      loadIssueHistory('<%= issue._id %>');
+    }
+
+    function openUpdateStatusModal() {
+      $('#newStatus').val('<%= issue.issue_status %>');
+      $('#statusComment').val('');
+      $('#visit_date').val('<%= issue.visit_date ? new Date(issue.visit_date).toISOString().split('T')[0] : "" %>');
+      $('#visit_time_range').val('<%= issue.visit_time_range || "" %>');
+      toggleVisitSchedulingSection();
+      $('#updateStatusModal').modal('show');
+    }
+
+    function toggleVisitSchedulingSection() {
+      const selectedStatus = $('#newStatus').val();
+      if (selectedStatus === 'visit_scheduled' || selectedStatus === 'visit_rescheduled') {
+        $('#visitSchedulingSection').removeClass('d-none');
+      } else {
+        $('#visitSchedulingSection').addClass('d-none');
+        $('#visit_date').val('');
+        $('#visit_time_range').val('');
+      }
+    }
+
+    function getStatusClass(status) {
+      switch (status) {
+        case "open": return "bg-primary";
+        case "in_progress": return "bg-warning text-dark";
+        case "resolved": return "bg-success";
+        case "rejected_after_visit": return "bg-danger";
+        case "visit_scheduled": return "bg-info";
+        case "visit_rescheduled": return "bg-orange";
+        case "closed": return "bg-secondary";
+        case "rejected": return "bg-dark";
+        default: return "bg-light text-dark";
+      }
+    }
+
+    $('#newStatus').on('change', toggleVisitSchedulingSection);
+
+    // Handle form submission
+    $('#statusUpdateForm').on('submit', function (e) {
+      e.preventDefault();
+
+      $.ajax({
+        url: '/caller/update-issue-status',
+        method: 'POST',
+        data: $(this).serialize(),
+        success: function (response) {
+          $('#updateStatusModal').modal('hide');
+          // Reload the page to show updated status
+          location.reload();
+        },
+        error: function (xhr) {
+          alert('Failed to update status. Please try again.');
+        }
+      });
+    });
+  </script>
 </body>
+
 </html>

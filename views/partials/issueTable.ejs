@@ -2,258 +2,401 @@
   <div class="card-header bg-white">
     <h5 class="mb-0">
       <i class="fas fa-list me-2 text-primary"></i>Filtered TV Issues
-      <span class="badge bg-primary ms-2"><%= pagination.totalIssues %></span>
+      <span class="badge bg-primary ms-2">
+        <%= pagination.totalIssues %>
+      </span>
     </h5>
   </div>
   <div class="card-body p-0">
-    <% if (issues.length === 0) { %>
-    <div class="text-center py-5">
-      <i class="fas fa-tv fa-3x text-muted mb-3"></i>
-      <h5 class="text-muted">No TV Issues Found</h5>
-    </div>
-    <% } else { %>
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Code</th>
-            <th>Issue</th>
-            <th>Customer</th>
-            <th>TV</th>
-            <th>Status</th>
-            <th>Created</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% issues.forEach(issue => { const c = issue.customer_info; %>
-          <tr>
-            <td>
-              <span class="badge bg-secondary"><%= issue.issue_code %></span>
-            </td>
-            <td>
-              <%= issue.issue_name %><br />
-              <small class="text-muted"><%= issue.issue_description %></small>
-            </td>
-            <td>
-              <strong><%= c.customer_name %></strong><br />
-              <small class="text-muted">
-                <% if (c.customer_phone) { %>
-                <i class="fas fa-phone me-1"></i> <%= c.customer_phone %><br />
-                <% } %> <% if (c.customer_city || c.customer_state) { %>
-                <i class="fas fa-map-marker-alt me-1"></i>
-                <%= c.customer_city || '' %>, <%= c.customer_state || '' %> <% }
-                %>
-              </small>
-            </td>
-            <td><%= issue.tv_model || '' %></td>
-            <td>
-              <% let statusClass = ""; %> <% switch(issue.issue_status) { case
-              "open": statusClass = "bg-primary"; break; case "in_progress":
-              statusClass = "bg-warning text-dark"; break; case "resolved":
-              statusClass = "bg-success"; break; case "rejected_after_visit":
-              statusClass = "bg-danger"; break; case "visit_scheduled":
-              statusClass = "bg-info"; break; case "closed": statusClass =
-              "bg-secondary"; break; case "rejected": statusClass = "bg-dark";
-              case "visit_rescheduled": statusClass ="bg-orange";
-              break; default: statusClass = "bg-light text-dark"; break; } %>
-              <span class="badge <%= statusClass %>">
-                <%= issue.issue_status.replace(/_/g, ' ') %>
-              </span>
-            </td>
-            <td><%= new Date(issue.created_at).toLocaleDateString() %></td>
-            <td class=" gap-1">
-                <a
-                  href="/caller/issue-details/<%= issue._id %>"
-                  class="btn btn-sm btn-outline-primary"
-                >
-                  View
-                </a>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-warning update-status-btn"
-                  data-issue-id="<%= issue._id %>"
-                  data-current-status="<%= issue.issue_status %>"
-                  data-visit-date="<%= issue.visit_date %>"
-                  data-visit-time-range = "<%= issue.visit_time_range %>"
-                  data-bs-toggle="modal"
-                  data-bs-target="#updateStatusModal"
-                >
-                  Update Status
-                </button>
-                <a
-    href="/caller/issue-history/<%= issue._id %>"
-    class="btn btn-sm btn-secondary mt-1"
-  >
-    <i class="fas fa-history me-1"></i>History
-  </a>
-              </td>
-              
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
-    <% } %>
+    <% if (issues.length===0) { %>
+      <div class="text-center py-5">
+        <i class="fas fa-tv fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No TV Issues Found</h5>
+      </div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Code</th>
+                <th>Issue</th>
+                <th>Customer</th>
+                <th>TV</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% issues.forEach(issue=> { const c = issue.customer_info; %>
+                <tr>
+                  <td>
+                    <span class="badge bg-secondary">
+                      <%= issue.issue_code %>
+                    </span>
+                  </td>
+                  <td>
+                    <%= issue.issue_name %><br />
+                      <small class="text-muted">
+                        <%= issue.issue_description %>
+                      </small>
+                  </td>
+                  <td>
+                    <strong>
+                      <%= c.customer_name %>
+                    </strong><br />
+                    <small class="text-muted">
+                      <% if (c.customer_phone) { %>
+                        <i class="fas fa-phone me-1"></i>
+                        <%= c.customer_phone %><br />
+                          <% } %>
+                            <% if (c.customer_city || c.customer_state) { %>
+                              <i class="fas fa-map-marker-alt me-1"></i>
+                              <%= c.customer_city || '' %>, <%= c.customer_state || '' %>
+                                  <% } %>
+                    </small>
+                  </td>
+                  <td>
+                    <%= issue.tv_model || '' %>
+                  </td>
+                  <td>
+                    <% let statusClass="" ; %>
+                      <% switch (issue.issue_status) { case "open" : statusClass="bg-primary" ; break;
+                        case "in_progress" : statusClass="bg-warning text-dark" ; break; case "resolved" :
+                        statusClass="bg-success" ; break; case "rejected_after_visit" : statusClass="bg-danger" ; break;
+                        case "visit_scheduled" : statusClass="bg-info" ; break; case "visit_rescheduled" :
+                        statusClass="bg-orange" ; break; case "closed" : statusClass="bg-secondary" ; break;
+                        case "rejected" : statusClass="bg-dark" ; break; default: statusClass="bg-light text-dark" ;
+                        break; } %>
+                        <span class="badge <%= statusClass %>">
+                          <%= issue.issue_status.replace(/_/g, ' ' ) %>
+                        </span>
+                  </td>
+                  <td>
+                    <%= new Date(issue.created_at).toLocaleDateString() %>
+                  </td>
+                  <td>
+                    <div class="d-flex flex-column flex-sm-row flex-wrap gap-1">
+                      <a href="/caller/issue-details/<%= issue._id %>" class="btn btn-sm btn-outline-primary">
+                        View
+                      </a>
+                      <button type="button" class="btn btn-sm btn-warning update-status-btn"
+                        data-issue-id="<%= issue._id %>" data-current-status="<%= issue.issue_status %>"
+                        data-visit-date="<%= issue.visit_date %>" data-visit-time-range="<%= issue.visit_time_range %>"
+                        data-bs-toggle="modal" data-bs-target="#updateStatusModal">
+                        Update Status
+                      </button>
+                      <button type="button" class="btn btn-sm btn-secondary history-btn"
+                        data-issue-id="<%= issue._id %>" data-bs-toggle="modal" data-bs-target="#historyModal">
+                        <i class="fas fa-history me-1"></i>History
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <% } %>
   </div>
 </div>
 
+
 <!-- Update Status Modal -->
-<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <form id="statusUpdateForm" method="POST" action="/caller/update-issue-status">
-        <input type="hidden" name="issue_id" id="modalIssueId" />
-  
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="updateStatusModalLabel">
-              <i class="fas fa-sync-alt me-2"></i>Update Issue Status
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="statusUpdateForm" method="POST" action="/caller/update-issue-status">
+      <input type="hidden" name="issue_id" id="modalIssueId" />
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateStatusModalLabel">
+            <i class="fas fa-sync-alt me-2"></i>Update Issue Status
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="newStatus" class="form-label">New Status</label>
+            <select class="form-select" name="new_status" id="newStatus" required>
+              <option value="">-- Select Status --</option>
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="visit_scheduled">Visit Scheduled</option>
+              <option value="resolved">Resolved</option>
+              <option value="rejected_after_visit">Rejected After Visit</option>
+              <option value="closed">Closed</option>
+              <option value="rejected">Rejected</option>
+              <option value="visit_rescheduled">Visit Rescheduled</option>
+            </select>
           </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label for="newStatus" class="form-label">New Status</label>
-              <select class="form-select" name="new_status" id="newStatus" required>
-                <option value="">-- Select Status --</option>
-                <option value="open">Open</option>
-                <option value="in_progress">In Progress</option>
-                <option value="visit_scheduled">Visit Scheduled</option>
-                <option value="resolved">Resolved</option>
-                <option value="rejected_after_visit">Rejected After Visit</option>
-                <option value="closed">Closed</option>
-                <option value="rejected">Rejected</option>
-                <option value="visit_rescheduled">Visit Rescheduled</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="statusComment" class="form-label">Comment (optional)</label>
-              <textarea class="form-control" name="comment" id="statusComment" rows="3"></textarea>
-            </div>
-            <div id="visitSchedulingSection" class="row d-none">
-              <div class="col-12 mb-3">
-                <div class="card border-primary">
-                  <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0">
-                      <i class="fas fa-calendar-alt me-2"></i>Visit Scheduling (Optional)
-                    </h6>
+          <div class="mb-3">
+            <label for="statusComment" class="form-label">Comment (optional)</label>
+            <textarea class="form-control" name="comment" id="statusComment" rows="3"></textarea>
+          </div>
+          <div id="visitSchedulingSection" class="row d-none">
+            <div class="col-12 mb-3">
+              <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                  <h6 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i>Visit Scheduling (Optional)
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="visit_date" class="form-label">
+                        <i class="fas fa-calendar me-2"></i>Visit Date
+                      </label>
+                      <input type="date" class="form-control form-control-lg" id="visit_date" name="visit_date"
+                        min="<%= new Date().toISOString().split('T')[0] %>" />
+                      <small class="text-muted">Select a date for the visit (optional)</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="visit_time_range" class="form-label">
+                        <i class="fas fa-clock me-2"></i>Visit Time Range
+                      </label>
+                      <select class="form-select form-select-lg" id="visit_time_range" name="visit_time_range">
+                        <option value="">Select time range (optional)</option>
+                        <option value="8:00 AM - 10:00 AM">8:00 AM - 10:00 AM</option>
+                        <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
+                        <option value="12:00 PM - 2:00 PM">12:00 PM - 2:00 PM</option>
+                        <option value="2:00 PM - 4:00 PM">2:00 PM - 4:00 PM</option>
+                        <option value="4:00 PM - 6:00 PM">4:00 PM - 6:00 PM</option>
+                        <option value="6:00 PM - 8:00 PM">6:00 PM - 8:00 PM</option>
+                      </select>
+                      <small class="text-muted">Choose a 2-hour time slot</small>
+                    </div>
                   </div>
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <label for="visit_date" class="form-label">
-                          <i class="fas fa-calendar me-2"></i>Visit Date
-                        </label>
-                        <input
-                          type="date"
-                          class="form-control form-control-lg"
-                          id="visit_date"
-                          name="visit_date"
-                          min="<%= new Date().toISOString().split('T')[0] %>"
-                        />
-                        <small class="text-muted">Select a date for the visit (optional)</small>
-                      </div>
-                      <div class="col-md-6 mb-3">
-                        <label for="visit_time_range" class="form-label">
-                          <i class="fas fa-clock me-2"></i>Visit Time Range
-                        </label>
-                        <select
-                          class="form-select form-select-lg"
-                          id="visit_time_range"
-                          name="visit_time_range"
-                        >
-                          <option value="">Select time range (optional)</option>
-                          <option value="8:00 AM - 10:00 AM">8:00 AM - 10:00 AM</option>
-                          <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
-                          <option value="12:00 PM - 2:00 PM">12:00 PM - 2:00 PM</option>
-                          <option value="2:00 PM - 4:00 PM">2:00 PM - 4:00 PM</option>
-                          <option value="4:00 PM - 6:00 PM">4:00 PM - 6:00 PM</option>
-                          <option value="6:00 PM - 8:00 PM">6:00 PM - 8:00 PM</option>
-                        </select>
-                        <small class="text-muted">Choose a 2-hour time slot</small>
-                      </div>
-                    </div>
-                    <div class="alert alert-info mb-0">
-                      <i class="fas fa-info-circle me-2"></i>
-                      <strong>Note:</strong> Visit scheduling is optional.
-                      You can schedule a visit later or leave these fields empty.
-                    </div>
+                  <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> Visit scheduling is optional.
+                    You can schedule a visit later or leave these fields empty.
                   </div>
                 </div>
               </div>
             </div>
-            
           </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-save me-1"></i>Save
-            </button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i>Save
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- History Modal -->
+<div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="historyModalLabel">
+          <i class="fas fa-history me-2"></i>Issue Status History
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="historyLoading" class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2 text-muted">Loading history...</p>
+        </div>
+        <div id="historyContent" class="d-none">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h6 class="text-muted mb-1">Issue Code</h6>
+              <p class="fw-bold" id="historyIssueCode"></p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-1">Issue Name</h6>
+              <p class="fw-bold" id="historyIssueName"></p>
+            </div>
+          </div>
+          <hr>
+          <div id="historyList">
+            <!-- History items will be loaded here -->
           </div>
         </div>
-      </form>
+        <div id="historyError" class="d-none">
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span id="errorMessage">Failed to load history</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
-  
-
-<% if (pagination.totalPages > 1) { %>
-<nav class="mt-4">
-  <ul class="pagination justify-content-center">
-    <% for (let i = 1; i <= pagination.totalPages; i++) { %>
-    <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
-      <a class="page-link" href="#" data-page="<%= i %>"><%= i %></a>
-    </li>
-    <% } %>
-  </ul>
-</nav>
-<% } %>
-
-<script>
-  function formatDate(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (`0${date.getMonth() + 1}`).slice(-2);
-    const day = (`0${date.getDate()}`).slice(-2);
-    return `${year}-${month}-${day}`;
-  }
-
-  function toggleVisitSchedulingSection() {
-  const selectedStatus = $('#newStatus').val();
-  if (selectedStatus === 'visit_scheduled' || selectedStatus === 'visit_rescheduled') {
-    $('#visitSchedulingSection').removeClass('d-none');
-  } else {
-    $('#visitSchedulingSection').addClass('d-none');
-    $('#visit_date').val('');
-    $('#visit_time_range').val('');
-  }
-}
+</div>
 
 
-  $(document).on('click', '.update-status-btn', function () {
-    const issueId = $(this).data('issue-id');
-    const currentStatus = $(this).data('current-status');
-    const currentVisitDate = $(this).data('visit-date');
-    const currentVisitTimeRange = $(this).data('visit-time-range');
+<% if (pagination.totalPages> 1) { %>
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center">
+      <% for (let i=1; i <=pagination.totalPages; i++) { %>
+        <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+          <a class="page-link" href="#" data-page="<%= i %>">
+            <%= i %>
+          </a>
+        </li>
+        <% } %>
+    </ul>
+  </nav>
+  <% } %>
 
-    $('#modalIssueId').val(issueId);
-    $('#newStatus').val(currentStatus);
-    $('#statusComment').val('');
+    <script>
+      function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const day = (`0${date.getDate()}`).slice(-2);
+        return `${year}-${month}-${day}`;
+      }
 
-    $('#visit_date').val(formatDate(currentVisitDate));
-    $('#visit_time_range').val(currentVisitTimeRange || '');
+      function toggleVisitSchedulingSection() {
+        const selectedStatus = $('#newStatus').val();
+        if (selectedStatus === 'visit_scheduled' || selectedStatus === 'visit_rescheduled') {
+          $('#visitSchedulingSection').removeClass('d-none');
+        } else {
+          $('#visitSchedulingSection').addClass('d-none');
+          $('#visit_date').val('');
+          $('#visit_time_range').val('');
+        }
+      }
 
-    toggleVisitSchedulingSection();
-  });
 
-  $('#newStatus').on('change', toggleVisitSchedulingSection);
-</script>
+      $(document).on('click', '.update-status-btn', function () {
+        const issueId = $(this).data('issue-id');
+        const currentStatus = $(this).data('current-status');
+        const currentVisitDate = $(this).data('visit-date');
+        const currentVisitTimeRange = $(this).data('visit-time-range');
+
+        $('#modalIssueId').val(issueId);
+        $('#newStatus').val(currentStatus);
+        $('#statusComment').val('');
+
+        $('#visit_date').val(formatDate(currentVisitDate));
+        $('#visit_time_range').val(currentVisitTimeRange || '');
+
+        toggleVisitSchedulingSection();
+      });
+
+      $('#newStatus').on('change', toggleVisitSchedulingSection);
+
+      // History modal functionality
+      $(document).on('click', '.history-btn', function () {
+        const issueId = $(this).data('issue-id');
+        loadIssueHistory(issueId);
+      });
+
+      function loadIssueHistory(issueId) {
+        // Show loading state
+        $('#historyLoading').removeClass('d-none');
+        $('#historyContent').addClass('d-none');
+        $('#historyError').addClass('d-none');
+
+        // Fetch history data
+        $.ajax({
+          url: `/caller/issue-history/${issueId}`,
+          method: 'GET',
+          success: function (data) {
+            $('#historyLoading').addClass('d-none');
+            $('#historyContent').removeClass('d-none');
+
+            // Update issue details
+            $('#historyIssueCode').text(data.issue.issue_code);
+            $('#historyIssueName').text(data.issue.issue_name);
+
+            // Build history list
+            const historyList = $('#historyList');
+            historyList.empty();
+
+            if (data.history.length === 0) {
+              historyList.html(`
+                <div class="text-center py-4">
+                  <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
+                  <p class="text-muted">No status history found for this issue.</p>
+                </div>
+              `);
+            } else {
+              data.history.forEach((item, index) => {
+                const statusClass = getStatusClass(item.new_status);
+                const changedBy = item.changed_by ? `${item.changed_by.firstName} ${item.changed_by.lastName}` : 'System';
+                const changedAt = new Date(item.changed_at).toLocaleString();
+
+                const historyItem = `
+                  <div class="card mb-3 ${index === 0 ? 'border-primary' : ''}">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-md-8">
+                          <div class="d-flex align-items-center mb-2">
+                            <span class="badge ${statusClass} me-2">${item.new_status.replace(/_/g, ' ')}</span>
+                            <small class="text-muted">${changedAt}</small>
+                          </div>
+                          ${item.comment ? `<p class="mb-2"><strong>Comment:</strong> ${item.comment}</p>` : ''}
+                          <div class="row">
+                            <div class="col-md-6">
+                              <small class="text-muted">Previous Status:</small><br>
+                              <span class="badge bg-light text-dark">${item.previous_status.replace(/_/g, ' ')}</span>
+                            </div>
+                            <div class="col-md-6">
+                              <small class="text-muted">Changed By:</small><br>
+                              <span class="fw-bold">${changedBy}</span>
+                            </div>
+                          </div>
+                          ${item.prev_visit_date !== 'NA' || item.current_visit_date !== 'NA' ? `
+                            <div class="mt-2">
+                              <small class="text-muted">Visit Date Changes:</small><br>
+                              <span class="text-muted">From: ${item.prev_visit_date === 'NA' ? 'Not set' : new Date(item.prev_visit_date).toLocaleDateString()}</span><br>
+                              <span class="text-muted">To: ${item.current_visit_date === 'NA' ? 'Not set' : new Date(item.current_visit_date).toLocaleDateString()}</span>
+                            </div>
+                          ` : ''}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+                historyList.append(historyItem);
+              });
+            }
+          },
+          error: function (xhr, status, error) {
+            $('#historyLoading').addClass('d-none');
+            $('#historyError').removeClass('d-none');
+            $('#errorMessage').text(xhr.responseJSON?.error || 'Failed to load history');
+          }
+        });
+      }
+
+      function getStatusClass(status) {
+        switch (status) {
+          case "open": return "bg-primary";
+          case "in_progress": return "bg-warning text-dark";
+          case "resolved": return "bg-success";
+          case "rejected_after_visit": return "bg-danger";
+          case "visit_scheduled": return "bg-info";
+          case "visit_rescheduled": return "bg-orange";
+          case "closed": return "bg-secondary";
+          case "rejected": return "bg-dark";
+          default: return "bg-light text-dark";
+        }
+      }
+    </script>
 
 
 
-<!-- jQuery (before Bootstrap) -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- jQuery (before Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-<!-- Bootstrap JS (must be included after jQuery) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <!-- Bootstrap JS (must be included after jQuery) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
