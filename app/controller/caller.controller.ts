@@ -878,7 +878,7 @@ class CallerController {
         .sort({ changed_at: -1 });
 
       // Return the data as JSON for AJAX request
-      res.json({
+      return res.json({
         issue: {
           issue_code: issue.issue_code,
           issue_name: issue.issue_name,
@@ -888,7 +888,7 @@ class CallerController {
       });
     } catch (error) {
       console.error("Error fetching issue history:", error);
-      res.status(500).json({ error: "Failed to fetch issue history" });
+      return res.status(500).json({ error: "Failed to fetch issue history" });
     }
   });
 }
